@@ -1,6 +1,8 @@
 restart
 R=QQ[x,y]
-f=(x^2+1)*y-1
+
+fr=(x^2+1)*y-1
+
 --define a ring map to get jets of order 3
 --we go mod t^4 because we don't care about higher t powers
 S=QQ[x0,x1,x2,x3,y0,y1,y2,y3,t] / ideal(t^4)
@@ -11,3 +13,8 @@ g=phi f
 (m,c)=coefficients(g,Variables=>{t})
 J3=ideal c
 netList J3_*
+
+
+--index ring test code
+S=QQ[x,y,a_0,a_1,hams]
+indexRing(2,S)
