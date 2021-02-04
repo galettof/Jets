@@ -7,9 +7,9 @@ indexRing = (d,R) -> (
         for s in symList list (
 	    if instance(s,IndexedVariable) then (
 	        name= separate("_", toString s);
-	        ("j"|name#0,name#1)
+	        name#0|name#1
             ) else (
-	        "j"|toString s
+	        toString s|"0"
 	    )
         );
     
