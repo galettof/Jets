@@ -3,7 +3,7 @@ indexRing = (d,R) -> (
     symList:= apply(gens R, baseName);
 
     --creates a list of variable names for our index ring
-    varNames=
+    varNames:=
         for s in symList list (
 	    if instance(s,IndexedVariable) then (
 	        name= separate("_", toString s);
@@ -14,7 +14,7 @@ indexRing = (d,R) -> (
         );
     
     --create our list of variableses
-    varList=
+    varList:=
         for n in varNames list (
        	   if instance(n,Sequence) then (
 	       new IndexedVariable from {value n#0,n#1}
@@ -24,7 +24,7 @@ indexRing = (d,R) -> (
         );
     
     --create our index ring
-    indRing := (coefficientRing R)[
+    indRing:= (coefficientRing R)[
     	mingle for v in varList list (
 	    if class v===IndexedVariable then (
 	    	apply(d+1, i -> new IndexedVariable from {v#0,(v#1,i)})
