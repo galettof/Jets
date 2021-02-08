@@ -1,16 +1,30 @@
+--BUG: see report
+
 --options list
-opts= {
-    ReturnVector=>false
+opts:= {
+    Gens=>false
     };
 
 
-jets=method(Options=>opts);
+jets= method(Options=>opts);
 
 jets(ZZ,Ring):= o -> (n,R) -> (
     --create index ring for jets
     load "indexRing.m2";
     S:= indexRing(n,R);
-    return S;
+    --this option doesnt work yet
+    if o.Gens then (
+	gensList:= apply(gens R, baseName);
+	gensSort:= 
+	return gens S;
+	) else (
+	return S;
+	);
+    )
+
+jets(ZZ,RingElement):= (n,f) -> (
+    
+    return "IT WORKS"
     )
 
 jets(ZZ,Ideal):= o -> (n,I) -> (
@@ -22,11 +36,10 @@ jets(ZZ,Ideal):= o -> (n,I) -> (
     (m,c):= coefficients(phi gens I,Variables=>{tVar});  
     J:= ideal apply(flatten reverse entries c, f -> lift(f,S));
     
-    if o.ReturnVector then( --this is not a vector in the way i was thinking
-	result= vector flatten entries gens J;
+    if o.Gens then (
+	return flatten entries gens J;
 	) else (
-    	result= J;
+    	return J;
 	);
-    return result;
     )
 

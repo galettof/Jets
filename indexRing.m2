@@ -1,3 +1,6 @@
+--BUG: error thrown on input of varieables indexed by a sequence
+
+
 indexRing = (d,R) -> (
     --our list of ring symbols to work with
     symList:= apply(gens R, baseName);
