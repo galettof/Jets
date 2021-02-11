@@ -1,4 +1,4 @@
-jets = (s,I) -> (
+jets0 = (s,I) -> (
     R := ring I;
     symList = apply(gens R,baseName);
     S := (coefficientRing R)[
@@ -19,4 +19,28 @@ jets = (s,I) -> (
     phi := map(T,R,(basis T)*M);
     (m,c) := coefficients(phi gens I,Variables=>{tVar});
     ideal apply(flatten reverse entries c, f -> lift(f,S))
+   )
+
+ArcSpace = new Type of HashTable
+
+arcs = method()
+
+arcs AffineVariety := X -> (
+    new ArcSpace from {
+    	cache => new CacheTable,
+	base => X
+	}
+    )
+
+jets = method()
+
+jets (ZZ,ArcSpace) := (n,A) -> (
+    --temporary function
+    f := A -> (
+    	X := A.base;
+    	I := ideal ring X;
+    	J := jets0(n,I);
+        Spec ((ring J)/J)
+	);
+    ((cacheValue n) f) A
     )
