@@ -6,7 +6,7 @@ opts:= {
     };
 
 
-jets= method(Options=>opts);
+jets= method(Options=>opts);--dependency
 
 jets(ZZ,Ring):= o -> (n,R) -> (
     --create index ring for jets
@@ -14,22 +14,21 @@ jets(ZZ,Ring):= o -> (n,R) -> (
     S:= indexRing(n,R);
     --this option doesnt work yet
     if o.Gens then (
-	gensList:= apply(gens R, baseName);
-	gensSort:= 
-	return gens S;
+	return mingle pack(numgens R, gens S);
 	) else (
 	return S;
 	);
     )
 
-jets(ZZ,RingElement):= (n,f) -> (
-    
-    return "IT WORKS"
+jets(ZZ,RingElement):= o -> (n,f) -> (
+    load "radicalJets.m2";
+    sum jetMonomials(n,f)
     )
 
 jets(ZZ,Ideal):= o -> (n,I) -> (
     --create jet ring
-    S:= jets(n, ring I);
+    R:= ring I;
+    S:= jets(n,R);
     T:= S[tVar]/ideal(tVar^(n+1));            
     M:= promote(matrix pack(dim R,gens S),T);
     phi:= map(T,R,(basis T)*M);                          
