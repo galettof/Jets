@@ -10,7 +10,6 @@ g=x^2*z
 
 jetMonomials(2,f)
 jetMonomials(2,g)
-
 jets(2,f)
 
 I=ideal(f, g)

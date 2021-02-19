@@ -15,3 +15,5 @@ comb= (idxs,varis) -> (
     H=hashTable(apply(pairs name, reverse));
     product apply(varis, i -> i^(number(idxs, n -> n==H#i)))
     )
+
+getTable= var -> (value first separate("_",toString var))

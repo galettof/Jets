@@ -1,5 +1,23 @@
-load "jetsMethod.m2"
-load "helpers.m2"
+jets(ZZ,Ideal):= o -> (n,I) -> (
+    --create jet ring
+    R:= ring I;
+    S:= jets(n,R);
+    T:= S[tVar]/ideal(tVar^(n+1));            
+    M:= promote(matrix pack(dim R,gens S),T);
+    phi:= map(T,R,(basis T)*M);                          
+    (m,c):= coefficients(phi gens I,Variables=>{tVar});  
+    J:= ideal apply(flatten reverse entries c, f -> lift(f,S));
+    
+    --conditional to test monomial ideal
+    
+    if o.Gens then (
+	return flatten entries gens J;
+	) else (
+    	return J;
+	);
+    )
+
+
 
 jetMonomials= (n,f) -> (
     expos:= flatten exponents f;
@@ -17,9 +35,9 @@ jetMonomials= (n,f) -> (
 
 --this does not check that I is a monomial ideal
 monomialJetsRadical= (n,I) -> (
---    R:= jets(n, ring I);
+    R:= jets(n, ring I);
     gensList:= flatten entries gens I;
     jetGens:= unique flatten apply(gensList, gen -> jetMonomials(n,gen));
-    squarefreeGens:= apply(apply(jetGens, support),product)
---    ideal(jetGens)
+    squarefreeGens:= apply(apply(jetGens, support),product);
+    ideal(jetGens)
     )
