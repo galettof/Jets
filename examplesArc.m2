@@ -7,10 +7,21 @@ f=x^2*y
 g=x+y
 I= ideal(f,g)
 X= Spec(R/I)
-
 A= arcs(X)
-n=4
-jets(7,A)
+
+S=QQ[x,y,z]
+a=x*y
+b=x+z
+J= ideal(a,b)
+Y= Spec(S/J)
+B= arcs(Y)
+
+
+
+
+
+
+
 
 
 

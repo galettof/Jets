@@ -25,8 +25,8 @@ jets(ZZ,Ring):= o -> (n,R) -> (
 
 jets(ZZ,ArcSpace):= o -> (n,A) -> (    
     m:= max keys A.cache;
-    if m==-1 then (
-    	
+  --  if m==-1 then (
+    if m < n then (	
 	f := A -> (
 	    R:= ring ambient A.base;
 	    I:= ideal ring A.base;
@@ -39,18 +39,18 @@ jets(ZZ,ArcSpace):= o -> (n,A) -> (
    	    );
 	((cacheValue n) f) A;
 	
-	) else if m < n then (
+--	) else if m < n then (
 	--????????????????????
 	
 	) else if not A.cache#?n then (
         
 	h:= A -> (
-	    m= max keys A.cache;
-	    H= A.cache#m_1;
-	    polys= flatten A.cache#m_0_{0..n};
-	    S= arcs(n,A); 
+	    m:= max keys A.cache;
+	    H:= A.cache#m_1;
+	    polys:= flatten A.cache#m_0_{0..n};
+	    S:= arcs(n,A); 
 	    polys= apply(polys, p -> lift(p,H));
-	    forget= map(S, H);
+	    forget:= map(S, H);
 	    polys= apply(polys, p -> forget p);
 	    T:= S[t];
 	    L:= pack(numgens ambient ring A.base, apply(polys, p-> promote(p,T)));
@@ -90,4 +90,18 @@ arcs (ZZ,ArcSpace) := (n,A) -> (
 	) else (
 	return R;
 	)
+    )
+
+--creates an instance of an element in jet_m in the ring of jet_n when m<n
+--this is a simple version and will require condition checking
+arcs (ZZ,ZZ,RingElement,ArcSpace) := (n,m,p,A) -> (
+    phi:= map(A.cache#n_1, A.cache#m_1);
+    promote(phi lift(p, A.cache#m_1), A.cache#n_2)
+    )
+
+--this one doesnt work yet  maybe "userSymbols ArcSpace" check whenever
+--making new ArcSpace to match variables.
+arcs (AA,RingElement,ArcSpace,ArcSpace) := (n,p,A,B) -> (
+    phi:= map(A.cache#n_1, B.cache#m_1);
+    promote
     )
