@@ -32,9 +32,9 @@ arcs AffineVariety := X -> (
 	}
     )
 
-jets = method()
+jets2 = method()
 
-jets (ZZ,ArcSpace) := (n,A) -> (
+jets2 (ZZ,ArcSpace) := (n,A) -> (
     --temporary function
     f := A -> (
     	X := A.base;
