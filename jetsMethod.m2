@@ -2,106 +2,98 @@ load "helpers.m2"
 --BUG: see report
 --
 --options list
-opts:= {
-    Gens=>false
-    };
+opts:= {};
 
-ArcSpace = new Type of HashTable;
+JetsFrame= new Type of HashTable;
 
 jets= method(Options=>opts);
 
-jets(ZZ,Ring):= o -> (n,R) -> (
-    --create index ring for jets
-    load "indexRing.m2";
-    S:= indexRing(n,R);
-    --this option doesnt work yet
-    if o.Gens then (
-	return mingle pack(numgens R, gens S);
-	) else (
-	return S;
-	);
+--create names for variables in jetRing (still needs fixed for variables of the
+--form a_(i,j,..)
+jetCoefficients:= (n,I,R) -> (
+    
     )
 
-
-jets(ZZ,ArcSpace):= o -> (n,A) -> (    
-    m:= max keys A.cache;
-  --  if m==-1 then (
-    if m < n then (	
-	f := A -> (
-	    R:= ring ambient A.base;
-	    I:= ideal ring A.base;
-	    S:= jets(n,R);
-	    T:= S[t];
-	    M:= promote(matrix pack(dim R, gens S),T);
-	    phi:= map(T,R,(basis(0,n,T)*M));
-	    (m,c):= coefficients(phi gens I,Variables=>{t});
-	    return (reverse entries c,S,T);
-   	    );
-	((cacheValue n) f) A;
-	
---	) else if m < n then (
-	--????????????????????
-	
-	) else if not A.cache#?n then (
-        
-	h:= A -> (
-	    m:= max keys A.cache;
-	    H:= A.cache#m_1;
-	    polys:= flatten A.cache#m_0_{0..n};
-	    S:= arcs(n,A); 
-	    polys= apply(polys, p -> lift(p,H));
-	    forget:= map(S, H);
-	    polys= apply(polys, p -> forget p);
-	    T:= S[t];
-	    L:= pack(numgens ambient ring A.base, apply(polys, p-> promote(p,T)));
-	    return (L,S,T)
-	    );
-	((cacheValue n) h) A;
-	
-	) else (
-	print("yay");
-	);
+initJetsVariables= R -> (
+    symList:= apply(gens R, baseName);
+    varNames:=
+        for s in symList list (
+	    if instance(s,IndexedVariable) then (
+	        name= separate("_", toString s);
+	        name#0|name#1
+            ) else (
+	        toString s|"0"
+	    )
+        );
+    varNames= apply(varNames,value)
     )
 
-arcs= method();
--- for cache:  -1 is null
-arcs AffineVariety := X -> (
-     new ArcSpace from {
-    	cache => new CacheTable from {-1 => null},
-	base => X
+--create jetFrame (container for jet stuff)
+jets QuotientRing:= o -> R -> (
+    varNames:= initJetsVariables ambient R;
+    I:= flatten entries presentation R;
+    S:= ambient R;
+    J0:= coefficientRing S[for n in varNames list (n_0)];
+    phi:= map(J0,S,gens J0);
+    I0:= apply(I, g -> phi g);
+    
+    new JetsFrame from {
+	cache=> new CacheTable from {
+	    0=> new HashTable from { 
+	    	jetsRing=> J0,
+	    	jetsGenerators=> I0
+      		}
+	    },
+	base=> S,
+	jetsGens=> I,
+	jetsVariables=> varNames
 	}
     )
 
---gives the index ring of order n in the arc space
-arcs (ZZ,ArcSpace) := (n,A) -> (
-    m:= max keys A.cache;
-    R:= A.cache#m_1;
-    C:= coefficientRing R;
-    numbase:= numgens ambient ring A.base;
-    indexNames:= toSequence apply(take(gens R, numbase), getTable); 
+jets(Ideal,Ring):= o -> (I,R) -> (jets(R/I))    
 
-    if n > m then(
-	return C[splice flatten {gens R, for i from m+1 to n list(
-		    indexNames_0_i,indexNames_1_i)}];
-	
-	) else if n < m then (
-	return C[flatten take(pack(numbase, gens R), n+1)];
-	
-	) else (
-	return R;
+
+--catch negative n.  what, if anything, should this return?
+jets(ZZ,JetsFrame):= o -> (n,J) -> (
+    m:= max keys J.cache;
+    bigGens1:= for i from 0 to m list(gens J.cache#i.jetsRing);
+    
+    
+    if m<n then (
+        
+	--make tower of rings
+	varNames:= J.jetsVariables;
+	J.cache#(m+1)= J.cache#m.jetsRing[for n in varNames list(n_(m+1))];
+    	bigGens2:= 
+	    {gens J.cache#(m+1)} |
+	    for i from m+2 to n list (
+	    	J.cache#i= J.cache#(i-1)[for n in varNames list (n_i)];
+	    	gens J.cache#i
+		);    
+
+	--get generators
+       	S:= J.cache#n;
+	I:= J.jetsGens;
+	T:= S[t];
+	M:= promote(matrix (bigGens1|bigGens2),T);
+	phi:= map(T,J.base,basis(0,n,T)*M);
+    	(d,c):= coefficients(phi matrix{I},Variables=>{t});
+	newGens:= reverse entries c;
+        
+	--populate jetsFrame
+    	f:= (n,J) -> (
+	    new HashTable from {
+		jetsRing=> J.cache#n,
+		jets=> newGens_n
+		}
+	    );
+	for i from m+1 to n do(
+	    J.cache#i= f(i,J);
+	    print(toString i);
+	    );
+        --return ideal    
+    	) else ( print("wheee")
+	--return ideal
 	)
-    )
-
---creates an instance of an element in jet_m in the ring of jet_n when m<n
---this is a simple version and will require condition checking
-arcs (ZZ,ZZ,RingElement,ArcSpace) := (n,m,p,A) -> (
-    phi:= map(A.cache#n_1, A.cache#m_1);
-    promote(phi lift(p, A.cache#m_1), A.cache#n_2)
-    )
-
---this one doesnt work yet  maybe "userSymbols ArcSpace" check whenever
---making new ArcSpace to match variables.
-arcs (AA,RingElement,ArcSpace,ArcSpace) := (n,p,A,B) -> (
-    phi:= map(A.cache#n_1, B.cache#m_1);
-    promote
-    )
+    );
+end
