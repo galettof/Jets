@@ -1,19 +1,16 @@
 load "helpers.m2"
---BUG: see report
---
---options list
+
+
+
 opts:= {};
 
 JetsFrame= new Type of HashTable;
 
 jets= method(Options=>opts);
 
---create names for variables in jetRing (still needs fixed for variables of the
---form a_(i,j,..)
-jetCoefficients:= (n,I,R) -> (
-    
-    )
+--helpers
 
+    --issue with variables of the form x_(i,j,..)
 initJetsVariables= R -> (
     symList:= apply(gens R, baseName);
     varNames:=
@@ -28,7 +25,10 @@ initJetsVariables= R -> (
     varNames= apply(varNames,value)
     )
 
+jetsRing= (n,J) -> (J.cache#n#jetsRing)
+
 --create jetFrame (container for jet stuff)
+    --possibiblity for option of user defined variable names
 jets QuotientRing:= o -> R -> (
     varNames:= initJetsVariables ambient R;
     I:= flatten entries presentation R;
@@ -56,14 +56,14 @@ jets(Ideal,Ring):= o -> (I,R) -> (jets(R/I))
 --catch negative n.  what, if anything, should this return?
 jets(ZZ,JetsFrame):= o -> (n,J) -> (
     m:= max keys J.cache;
-    bigGens1:= for i from 0 to m list(gens J.cache#i.jetsRing);
+    bigGens1:= for i from 0 to m list(gens J.cache#i#jetsRing);
     
     
     if m<n then (
         
 	--make tower of rings
 	varNames:= J.jetsVariables;
-	J.cache#(m+1)= J.cache#m.jetsRing[for n in varNames list(n_(m+1))];
+	J.cache#(m+1)= J.cache#m#jetsRing[for n in varNames list(n_(m+1))];
     	bigGens2:= 
 	    {gens J.cache#(m+1)} |
 	    for i from m+2 to n list (
