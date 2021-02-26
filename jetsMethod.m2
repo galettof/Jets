@@ -25,7 +25,7 @@ initJetsVariables= R -> (
     varNames= apply(varNames,value)
     )
 
-jetsRing= (n,J) -> (J.cache#n#jetsRing)
+jetsRing= (n,J) -> (J.cache#n)
 
 --create jetFrame (container for jet stuff)
     --possibiblity for option of user defined variable names
@@ -38,12 +38,10 @@ jets QuotientRing:= o -> R -> (
     I0:= apply(I, g -> phi g);
     
     new JetsFrame from {
-	cache=> new CacheTable from {
-	    0=> new HashTable from { 
-	    	jetsRing=> J0,
-	    	jetsGenerators=> I0
-      		}
-	    },
+	cache => new CacheTable from {
+	    0=> J0, 
+	    maxm=> 0
+       	    },
 	base=> S,
 	jetsGens=> I,
 	jetsVariables=> varNames
@@ -53,20 +51,18 @@ jets QuotientRing:= o -> R -> (
 jets(Ideal,Ring):= o -> (I,R) -> (jets(R/I))    
 
 
---catch negative n.  what, if anything, should this return?
+--catch negative n.  Returning ideal for now.
 jets(ZZ,JetsFrame):= o -> (n,J) -> (
-    m:= max keys J.cache;
-    bigGens1:= for i from 0 to m list(gens J.cache#i#jetsRing);
+    m:= J.cache#maxm;
+    bigGens1:= for i from 0 to m list(gens J.cache#i);
     
     
     if m<n then (
         
 	--make tower of rings
 	varNames:= J.jetsVariables;
-	J.cache#(m+1)= J.cache#m#jetsRing[for n in varNames list(n_(m+1))];
     	bigGens2:= 
-	    {gens J.cache#(m+1)} |
-	    for i from m+2 to n list (
+	    for i from m+1 to n list (
 	    	J.cache#i= J.cache#(i-1)[for n in varNames list (n_i)];
 	    	gens J.cache#i
 		);    
@@ -78,22 +74,15 @@ jets(ZZ,JetsFrame):= o -> (n,J) -> (
 	M:= promote(matrix (bigGens1|bigGens2),T);
 	phi:= map(T,J.base,basis(0,n,T)*M);
     	(d,c):= coefficients(phi matrix{I},Variables=>{t});
-	newGens:= reverse entries c;
-        
-	--populate jetsFrame
-    	f:= (n,J) -> (
-	    new HashTable from {
-		jetsRing=> J.cache#n,
-		jets=> newGens_n
-		}
-	    );
-	for i from m+1 to n do(
-	    J.cache#i= f(i,J);
-	    print(toString i);
-	    );
-        --return ideal    
-    	) else ( print("wheee")
-	--return ideal
+	J.cache#jetsMatrix= matrix reverse entries c;
+	J.cache#maxm= n;
+	J.cache#varsMatrix= M;
+	ideal apply(flatten entries c, f -> lift(f,J.cache#n))
+	
+    	) else ( 
+	ideal apply(flatten entries (J.cache#jetsMatrix^{0..n}),
+	    f -> lift(f, J.cache#n))
+	
 	)
     );
 end
