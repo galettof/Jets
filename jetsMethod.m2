@@ -1,10 +1,6 @@
 load "helpers.m2"
 
-
-
 opts:= {};
-
-JetsFrame= new Type of HashTable;
 
 jets= method(Options=>opts);
 
@@ -25,64 +21,74 @@ initJetsVariables= R -> (
     varNames= apply(varNames,value)
     )
 
-jetsRing= (n,J) -> (J.cache#n)
-
---create jetFrame (container for jet stuff)
-    --possibiblity for option of user defined variable names
-jets QuotientRing:= o -> R -> (
-    varNames:= initJetsVariables ambient R;
-    I:= flatten entries presentation R;
-    S:= ambient R;
-    J0:= coefficientRing S[for n in varNames list (n_0)];
-    phi:= map(J0,S,gens J0);
-    I0:= apply(I, g -> phi g);
+jets(ZZ,Ring):= o -> (n,R) -> (
+    --initialize jets base by inserting hashtable into input ring and forming
+    --the jets ring of order 0
+    if not R.? jets then (
+    	varBase:= initJetsVariables ambient R;
+	R.jets= new CacheTable from {
+	    varis=> varBase,
+	    maxOrder=> 0,
+	    jetsRing=> coefficientRing R[for name in varBase list (name_0)]
+	    }
+	);
     
-    new JetsFrame from {
-	cache => new CacheTable from {
-	    0=> J0, 
-	    maxm=> 0
-       	    },
-	base=> S,
-	jetsGens=> I,
-	jetsVariables=> varNames
-	}
+    m:= R.jets#maxOrder;
+    varNames:= R.jets#varis;
+    S:= R.jets#jetsRing;
+    
+    --build jet ring tower incrementally up to order n
+    if n>m then (
+	for i from m+1 to n do(
+	    S= S[for name in varNames list(name_i)];
+            );
+     	R.jets#maxOrder= n;
+	R.jets#jetsRing= S;
+	
+	) else if m>n then (
+	for i from 0 to m-n-1 do (
+	    S= coefficientRing S;
+	    )
+	); 
+    return S;
     )
 
-jets(Ideal,Ring):= o -> (I,R) -> (jets(R/I))    
 
-
---catch negative n.  Returning ideal for now.
-jets(ZZ,JetsFrame):= o -> (n,J) -> (
-    m:= J.cache#maxm;
-    bigGens1:= for i from 0 to m list(gens J.cache#i);
+jets(ZZ,Ideal):= o -> (n,I) -> (
+    if not I.cache.? jets then (
+	I.cache.jets= new CacheTable from {
+	    maxOrder=> 0
+	    };
+    	);
     
+    R:= ring I;
+    S:= jets(n,R);
+    polys:= flatten entries gens I;
+    m:= I.cache.jets#maxOrder;
     
-    if m<n then (
-        
-	--make tower of rings
-	varNames:= J.jetsVariables;
-    	bigGens2:= 
-	    for i from m+1 to n list (
-	    	J.cache#i= J.cache#(i-1)[for n in varNames list (n_i)];
-	    	gens J.cache#i
-		);    
-
-	--get generators
-       	S:= J.cache#n;
-	I:= J.jetsGens;
-	T:= S[t];
-	M:= promote(matrix (bigGens1|bigGens2),T);
-	phi:= map(T,J.base,basis(0,n,T)*M);
-    	(d,c):= coefficients(phi matrix{I},Variables=>{t});
-	J.cache#jetsMatrix= matrix reverse entries c;
-	J.cache#maxm= n;
-	J.cache#varsMatrix= M;
-	ideal apply(flatten entries c, f -> lift(f,J.cache#n))
-	
-    	) else ( 
-	ideal apply(flatten entries (J.cache#jetsMatrix^{0..n}),
-	    f -> lift(f, J.cache#n))
-	
-	)
-    );
+    if n>m then (
+    	T:= S[t];
+	Stemp:= S;
+	ringVars:= (for i from 0 to n-1 list( 
+	    gens Stemp
+	    ) do (
+	    Stemp= coefficientRing Stemp;
+	    )) | ({gens Stemp});
+	M:= promote(matrix reverse ringVars,T);
+	phi:= map(T,R,basis(0,n,T)*M);
+	(d,c):= coefficients(phi matrix{polys},Variables=>{t});
+	I.cache.jets.jetsMatrix= c;
+	I.cache.jets#maxOrder= n;
+	);
+    
+    jetsMatrix:= I.cache.jets.jetsMatrix; 
+    ideal apply((flatten reverse entries jetsMatrix)_{0..n}, p -> lift(p,S))
+    )
+    
 end
+
+jets (ZZ,RingMap):= o -> (n,phi) -> (
+    
+    map(JS,R,ph )
+
+    ) 
