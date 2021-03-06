@@ -71,24 +71,25 @@ jets(ZZ,Ideal):= o -> (n,I) -> (
     
     if n>m then (
 	T:= S[t]/t^(n+1);
-	Stemp:= S;
+	tempS:= S;
 	ringVars:= (for i from 0 to n-1 list( 
-	    gens Stemp
+	    gens tempS
 	    ) do (
-	    Stemp= coefficientRing Stemp;
-	    )) | ({gens Stemp});
+	    tempS= coefficientRing tempS;
+	    )) | ({gens tempS});
 	M:= promote(matrix reverse ringVars,T);
 	phi:= map(T,R,basis(0,n,T)*M);
 	(d,c):= coefficients(phi gens I,Variables=>{t});
-	I.cache.jets.jetsMatrix= c;
+	I.cache.jets#jetsMatrix= lift(matrix(reverse entries c),S);
 	I.cache.jets#maxOrder= n;
 	m=n;
 	);
-    
-    jetsMatrix:= I.cache.jets.jetsMatrix; 
+   
+    JMatrix:= I.cache.jets#jetsMatrix; 
     --flatten? maybe use a matrix?
-    ideal apply(flatten (reverse entries jetsMatrix)_{0..n}, p -> lift(p,S))
+--    ideal apply(flatten (reverse entries jetsMatrix)_{0..n}, p -> lift(p,S))
 --    ideal transpose lift(jetsMatrix^(reverse toList((m-n)..m)),S)
+    ideal (JMatrix)^{0..n}
     )
     
 end
