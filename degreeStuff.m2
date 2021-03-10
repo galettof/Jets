@@ -7,7 +7,7 @@ S= jets(n,R);
 jets(3,I);
 m= I.cache.jets#maxOrder;
 
-T= S[t,Degrees=> ]/t^(n+1);
+T= S[t]/t^(n+1);
 b= basis(0,n,T);
 tempS= S;
 ringVars= reverse join(
