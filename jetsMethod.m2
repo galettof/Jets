@@ -78,11 +78,11 @@ jets(ZZ,Ideal):= o -> (n,I) -> (
 	    tempS= coefficientRing tempS;
 	    )) | ({gens tempS});
 	M:= promote(matrix reverse ringVars,T);
+	--try monomials option to reverse ts instead
 	phi:= map(T,R,basis(0,n,T)*M);
 	(d,c):= coefficients(phi gens I,Variables=>{t});
 	I.cache.jets#jetsMatrix= lift(matrix(reverse entries c),S);
 	I.cache.jets#maxOrder= n;
-	m=n;
 	);
    
     JMatrix:= I.cache.jets#jetsMatrix; 
