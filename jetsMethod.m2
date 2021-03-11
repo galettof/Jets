@@ -59,37 +59,55 @@ jets(ZZ,Ring):= o -> (n,R) -> (
 
 
 jets(ZZ,Ideal):= o -> (n,I) -> (
+    R:= ring I;
     if not I.cache.? jets then (
 	I.cache.jets= new CacheTable from {
-	    maxOrder=> 0
+	    maxOrder=> 0,
+	    jetsMatrix=> (map((jets(0,R),R,gens jets(0,R)))) gens I
 	    };
     	);
     
-    R:= ring I;
-    S:= jets(n,R);
     m:= I.cache.jets#maxOrder;
-    
+    --calculate higher order entries if needed
     if n>m then (
+        S:= jets(n,R);
 	T:= S[t]/t^(n+1);
+	b:= basis(0,n,T);
 	tempS:= S;
-	ringVars:= (for i from 0 to n-1 list( 
-	    gens tempS
-	    ) do (
-	    tempS= coefficientRing tempS;
-	    )) | ({gens tempS});
-	M:= promote(matrix reverse ringVars,T);
-	--try monomials option to reverse ts instead
-	phi:= map(T,R,basis(0,n,T)*M);
-	(d,c):= coefficients(phi gens I,Variables=>{t});
-	I.cache.jets#jetsMatrix= lift(matrix(reverse entries c),S);
+	ringVars:= reverse join(
+	    (for i from 0 to n-1 list( 
+		    gens tempS
+		    ) do (
+		    tempS= coefficientRing tempS)),
+	    {gens tempS}
+	    );
+	M:= promote(matrix ringVars,T);
+	phi:= map(T,R,b*M);
+	(d,c):= coefficients(phi gens I,Monomials=>b_{m+1..n});
+	resultMatrix:= I.cache.jets#jetsMatrix || lift(matrix(entries c),S);
+    	
+	--update value in ideal cache
+	I.cache.jets#jetsMatrix= resultMatrix;
 	I.cache.jets#maxOrder= n;
 	);
    
+    --retrieve ideal of appropriate order
     JMatrix:= I.cache.jets#jetsMatrix; 
-    --flatten? maybe use a matrix?
---    ideal apply(flatten (reverse entries jetsMatrix)_{0..n}, p -> lift(p,S))
---    ideal transpose lift(jetsMatrix^(reverse toList((m-n)..m)),S)
     ideal (JMatrix)^{0..n}
+    )
+
+--how to store ideal information we caculate here?
+jets(ZZ,RingMap):= o -> (n,phi) -> (
+    I:= ideal(phi.matrix);
+    jets(n,I);
+    
+    
+    (JR, transferR):= flattenRing jets(n,phi.source);
+    (JS, transferS):= flattenRing jets(n,phi.target);
+    targs:= transferS (I.cache.jets#jetsMatrix);
+    psi:= map(JS,JR,flatten targs^{0..n});
+    (inverse transferS) * psi * transferR
     )
     
 end
+
