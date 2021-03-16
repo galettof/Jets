@@ -34,7 +34,7 @@ jets(ZZ,Ring):= o -> (n,R) -> (
     if not R.? jets then (
 	R.jets= new CacheTable from {
 	    maxOrder=> 0,
-	    jetsRing=> coefficientRing R[jetsVariables(0,R)]
+	    jetsRing=> coefficientRing R[jetsVariables(0,R), Join=> false]
 	    }
 	);
     
@@ -44,7 +44,7 @@ jets(ZZ,Ring):= o -> (n,R) -> (
     --build jet ring tower incrementally up to order n
     if n>m then (
 	for i from m+1 to n do(
-	    S= S[jetsVariables(i,R)];
+	    S= S[jetsVariables(i,R), Join=> false];
             );
      	R.jets#maxOrder= n;
 	R.jets#jetsRing= S;
@@ -71,8 +71,8 @@ jets(ZZ,Ideal):= o -> (n,I) -> (
     --calculate higher order entries if needed
     if n>m then (
         S:= jets(n,R);
-	T:= S[t]/t^(n+1);
-	b:= basis(0,n,T);
+	T:= S[t, Join=> false]/t^(n+1);
+	b:= basis T;
 	tempS:= S;
 	ringVars:= reverse join(
 	    (for i from 0 to n-1 list( 
@@ -81,10 +81,10 @@ jets(ZZ,Ideal):= o -> (n,I) -> (
 		    tempS= coefficientRing tempS)),
 	    {gens tempS}
 	    );
-	M:= promote(matrix ringVars,T);
+	M:= matrix ringVars,T;
 	phi:= map(T,R,b*M);
 	(d,c):= coefficients(phi gens I,Monomials=>b_{m+1..n});
-	resultMatrix:= I.cache.jets#jetsMatrix || lift(matrix(entries c),S);
+	resultMatrix:= I.cache.jets#jetsMatrix || lift(c,S);
     	
 	--update value in ideal cache
 	I.cache.jets#jetsMatrix= resultMatrix;
