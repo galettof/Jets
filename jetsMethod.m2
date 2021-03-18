@@ -1,9 +1,7 @@
-opts:= {};
 
-jets= method(Options=>opts);
-
---helpers
-
+---------------------------------------------------------------------------
+--helpers------------------------------------------------------------------
+---------------------------------------------------------------------------
 --create new-tier variables for jets ring
 jetsVariables= (n,R) -> (
     symList:= apply(gens R, baseName);
@@ -21,18 +19,24 @@ jetsVariables= (n,R) -> (
     )
 
 
+--------------------------------------------------------------------------
+--method functions--------------------------------------------------------
+--------------------------------------------------------------------------
+opts:= {};
 
-
---method functions
-
+jets= method(Options=>opts);
 
 
 jets(ZZ,Ring):= o -> (n,R) -> (
     --the jets ring of order 0..MAYBE jets(Ring) accomplishes this step?
     if not R.? jets then (
+	jetDegs:= degrees R;
 	R.jets= new CacheTable from {
 	    maxOrder=> 0,
-	    jetsRing=> coefficientRing R[jetsVariables(0,R), Join=> false]
+	    jetsRing=> coefficientRing R[jetsVariables(0,R), 
+		                         Join=> false,
+					 Degrees=> jetDegs],
+	    jetsDegrees => jetDegs
 	    }
 	);
     
@@ -42,7 +46,9 @@ jets(ZZ,Ring):= o -> (n,R) -> (
     --build jet ring tower incrementally up to order n
     if n>m then (
 	for i from m+1 to n do(
-	    S= S[jetsVariables(i,R), Join=> false];
+	    S= S[jetsVariables(i,R), 
+		 Join=> false,
+		 Degrees=> R.jets#jetsDegrees];
             );
      	R.jets#maxOrder= n;
 	R.jets#jetsRing= S;
@@ -107,5 +113,19 @@ jets(ZZ,RingMap):= o -> (n,phi) -> (
     (inverse transferS) * psi * transferR
     )
     
-end
+---------------------------------------------------------------------------
+--secondary functions--------------------------------------------------------
+---------------------------------------------------------------------------
 
+radicalJets= (n,I) -> (
+    if isMonomialIdeal I then (
+	baseIdeal:= jets(n,I);
+	R:= ring I;
+	gensList:= flatten entries gens baseIdeal;
+	termList:= apply(gensList, t-> terms(coefficientRing R, t));
+	squarefreeGens:= apply(apply(flatten termList, support),product);
+	ideal(squarefreeGens)
+	) else (
+	radical jets(n,I)
+	)
+    )
