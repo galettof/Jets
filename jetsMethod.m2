@@ -1,5 +1,3 @@
-load "helpers.m2"
-
 opts:= {};
 
 jets= method(Options=>opts);
