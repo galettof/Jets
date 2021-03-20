@@ -26,9 +26,7 @@ opts:= {};
 
 jets= method(Options=>opts);
 
-
 jets(ZZ,Ring):= o -> (n,R) -> (
-    --the jets ring of order 0..MAYBE jets(Ring) accomplishes this step?
     if not R.? jets then (
 	jetDegs:= degrees R;
 	R.jets= new CacheTable from {
@@ -85,7 +83,7 @@ jets(ZZ,Ideal):= o -> (n,I) -> (
 		    tempS= coefficientRing tempS)),
 	    {gens tempS}
 	    );
-	M:= matrix ringVars,T;
+	M:= matrix ringVars;
 	phi:= map(T,R,b*M);
 	(d,c):= coefficients(phi gens I,Monomials=>b_{m+1..n});
 	resultMatrix:= I.cache.jets#jetsMatrix || lift(c,S);
