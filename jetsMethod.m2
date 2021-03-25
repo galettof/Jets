@@ -18,39 +18,51 @@ jetsVariables= (n,R) -> (
     varNames= apply(varNames,value)
     )
 
+--generate degree list for projective jets variables
+degGenerator= (n,R) -> (
+    L:= if isRing R then degrees R else R;
+    if n==1 then L else (for a in L list(apply(a, i -> i*n)))
+    )
 
 --------------------------------------------------------------------------
 --method functions--------------------------------------------------------
 --------------------------------------------------------------------------
-opts:= {};
+opts:= {
+    Projective=> false
+    };
 
 jets= method(Options=>opts);
 
 jets(ZZ,Ring):= o -> (n,R) -> (
-    if not R.? jets then (
-	jetDegs:= degrees R;
-	R.jets= new CacheTable from {
+    --name to assign hashtable stored in basering depending on whether
+    --are working in the projective or affine case
+    typeName:= if o.Projective then (projets) else (jets);
+    degMultiplier:= null;
+    if not R.? typeName then (
+	degMultiplier= if o.Projective then 0 else 1;
+	jetDegs:= degGenerator(degMultiplier, R);
+	R#typeName= new CacheTable from {
 	    maxOrder=> 0,
 	    jetsRing=> coefficientRing R[jetsVariables(0,R), 
 		                         Join=> false,
 					 Degrees=> jetDegs],
-	    jetsDegrees => jetDegs
 	    }
 	);
     
-    m:= R.jets#maxOrder;
-    S:= R.jets#jetsRing;
+    m:= R#typeName#maxOrder;
+    S:= R#typeName#jetsRing;
     
     --build jet ring tower incrementally up to order n
+    --this is inefficient in the affine case
     if n>m then (
 	for i from m+1 to n do(
+    	    degMultiplier= if o.Projective then i else 1;
 	    S= S[jetsVariables(i,R), 
-		 Join=> false,
-		 Degrees=> R.jets#jetsDegrees];
+		Join=> false, 
+		Degrees=> degGenerator(degMultiplier,R)];
             );
-     	R.jets#maxOrder= n;
-	R.jets#jetsRing= S;
-	
+     	R#typeName#maxOrder= n;
+	R#typeName#jetsRing= S;
 	) else if m>n then (
 	for i from 0 to m-n-1 do (
 	    S= coefficientRing S;
@@ -58,7 +70,6 @@ jets(ZZ,Ring):= o -> (n,R) -> (
 	); 
     return S;
     )
-
 
 jets(ZZ,Ideal):= o -> (n,I) -> (
     R:= ring I;
