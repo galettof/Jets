@@ -73,7 +73,7 @@ jets(ZZ,Ideal):= o -> (n,I) -> (
     --calculate higher order entries if needed
     if n>m then (
         S:= jets(n,R);
-	T:= S[t, Join=> false]/t^(n+1);
+	T:= S[t, Degrees=> {degree 1_R}, Join=> false]/(ideal(t^(n+1)));
 	b:= basis T;
 	tempS:= S;
 	ringVars:= reverse join(
@@ -85,7 +85,7 @@ jets(ZZ,Ideal):= o -> (n,I) -> (
 	    );
 	M:= matrix ringVars;
 	phi:= map(T,R,b*M);
-	(d,c):= coefficients(phi gens I,Monomials=>b_{m+1..n});
+	(d,c):= coefficients(phi gens I, Monomials=>b_{m+1..n});
 	resultMatrix:= I.cache.jets#jetsMatrix || lift(c,S);
     	
 	--update value in ideal cache

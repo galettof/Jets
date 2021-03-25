@@ -1,41 +1,40 @@
-load "jetsMethod.m2"
+load "projDegree.m2"
 
-Rt=QQ[x,y,z];
-IR= ideal(x^2*y, y*z^2);
-
-St=QQ[x,y,z,Degrees=>{2,3,3}];
-IS= ideal(x^2*y, y*z^2);
-
-Tt=QQ[x,y,z,Degrees=>{{2,0,0},{2,1,2},{4,3,1}}];
-IT= ideal(x^2*y, y*z^2);
-
-
-R= QQ[x,y,z];
+R=QQ[x,y,z];
 I= ideal(x^2*y, y*z^2);
+
+R1=QQ[x,y,z,Degrees=>{2,3,3}];
+I1= ideal(x^2*y, y*z^2);
+
+R2=QQ[x,y,z,Degrees=>{{2,0,0},{2,1,2},{4,3,1}}];
+I2= ideal(x^2*y, y*z^2);
+
 m=-1;
 n=2;
 
 
 end
-    --using homogeneous T basis
-        S:= jets(n,R);
-	T:= S[u,t,Join=> false]/(ideal(t^(n+1)));--/((ideal(u,t))^(n+1));
-	b:= basis (n,T);
-	tempS:= S;
-	ringVars:= reverse join(
-	    (for i from 0 to n-1 list( 
-		    gens tempS
-		    ) do (
-		    tempS= coefficientRing tempS)),
-	    {gens tempS}
-	    );
-	M:= matrix ringVars;
-	pM:= b*M;
-	phi:= map(T,R,pM, DegreeMap=> L-> {n+1});
-	uM:= phi gens I;
-	(d,c):= coefficients(uM);
-    	result:= lift(c,S);
-    	cheat:= matrix(entries result);
+opts={Projective=> false)
+
+jetsIp= opts >> o -> (n,I) -> (
+    S:= jetsp(n,R, Projective=> true);--o.Projective);
+    T:= S[t,Degrees=> {degree 1_R}, Join=> false]/(ideal(t^(n+1)));
+    b:= basis T;
+    tempS:= S;
+    ringVars:= reverse join(
+	(for i from 0 to n-1 list( 
+		gens tempS
+		) do (
+		tempS= coefficientRing tempS)),
+	{gens tempS}
+	);
+    M:= matrix ringVars;
+    pM:= b*M;
+    phi:= map(T,R,pM);--, DegreeMap=> L-> {n+1});
+    uM:= phi gens I;
+    (d,c):= coefficients(uM,Monomials=> b_{m+1..n});
+    result:= lift(c,S);
+    cheat:= matrix(entries result);
 
 
 --application of ring map p to matrix m from ringmap.m2
