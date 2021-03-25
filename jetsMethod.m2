@@ -38,7 +38,7 @@ jets(ZZ,Ring):= o -> (n,R) -> (
     --are working in the projective or affine case
     typeName:= if o.Projective then (projets) else (jets);
     degMultiplier:= null;
-    if not R.? typeName then (
+    if not R#? typeName then (
 	degMultiplier= if o.Projective then 0 else 1;
 	jetDegs:= degGenerator(degMultiplier, R);
 	R#typeName= new CacheTable from {
@@ -73,17 +73,19 @@ jets(ZZ,Ring):= o -> (n,R) -> (
 
 jets(ZZ,Ideal):= o -> (n,I) -> (
     R:= ring I;
+    S:= null;--S refers to the jets ring
     if not I.cache.? jets then (
+	S= jets(0,R);
 	I.cache.jets= new CacheTable from {
 	    maxOrder=> 0,
-	    jetsMatrix=> (map((jets(0,R),R,gens jets(0,R)))) gens I
+	    jetsMatrix=> (map(S,R,vars S)) gens I
 	    };
     	);
-    
+   
     m:= I.cache.jets#maxOrder;
     --calculate higher order entries if needed
     if n>m then (
-        S:= jets(n,R);
+        S= jets(n,R);
 	T:= S[t, Degrees=> {degree 1_R}, Join=> false]/(ideal(t^(n+1)));
 	b:= basis T;
 	tempS:= S;
