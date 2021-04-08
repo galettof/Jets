@@ -1,7 +1,7 @@
 load "jetsMethod.m2"
 
-R0=QQ[x,y,z];
-I0= ideal(x^2*y, y*z^2);
+R=QQ[x,y,z];
+I= ideal(x^2+1);
 
 R1=QQ[x,y,z,Degrees=>{2,2,2}];
 I1= ideal(x^2*y, y*z^2);
@@ -32,8 +32,8 @@ jetsDegrees= opts >> o -> R -> (
 
 jetsp= opts >> o -> (n,I) -> (
     R:= ring I;
-    (Tdegrees, degreeMap):= jetsDegrees (R, Projective=> o.Projective);
-    S:= jets(n,R, Projective=> o.Projective);
+    (Tdegrees, degreeMap):= jetsDegrees (R, Projective=> true);-- o.Projective);
+    S:= jets(n,R, Projective=> true);--o.Projective);
     T:= S[t,Degrees=> Tdegrees, Join=> false]/(ideal(t^(n+1)));--determine deg of tb
     tempS:= S;
     Tpolys:= reverse join(
@@ -43,7 +43,7 @@ jetsp= opts >> o -> (n,I) -> (
 		tempS= coefficientRing tempS)),
 	{promote (matrix t^0,T) * vars tempS}
 	);
-    phi:= map(T,R,sum Tpolys, DegreeMap=> degreeMap);--need better deg map
+    phi:= map(T,R,sum Tpolys,DegreeMap=> degreeMap);--need better deg map
     (d,c):= coefficients(phi gens I,Monomials=> (basis T)_{0..n});--m+1..n});
     result:= lift(c,S)
 )
