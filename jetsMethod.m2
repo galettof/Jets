@@ -1,8 +1,4 @@
-opts:= {
-    Projective=> false
-    };
-
----------------------------------------------------------------------------
+-------=-------------------------------------------------------------------
 --helpers------------------------------------------------------------------
 ---------------------------------------------------------------------------
 --create new-tier variables for jets ring
@@ -27,24 +23,28 @@ degGenerator= (n,R) -> (
     if n==1 then L else (for a in L list(apply(a, i -> i*n)))
     )
 
---generate degrees/map for truncation ring in ideal calculation
-jetsDegrees= opts >> o -> R -> (
-    Tdegrees:= null;
-    degreeMap:= null;
+--generate ring for special case in projective jets ideals
+jetsDegrees:= (n,R) -> (
+    --a ring of variables corresponding to unique degrees of variable in R
+    baseDegrees:= unique degrees R;
+    degreeRing:= jets(n,R,Projective=>true)[for i from 0 to (length baseDegrees-1) list(u_i), 
+                       	                    Degrees=>baseDegrees, 
+		      	   		    Join=>false];
     
-    if o.Projective then (
-	Tdegrees= -1 * {degree R_1};
-	degreeMap= d -> degree 1_R;
-	) else (
-	Tdegrees= {degree 1_R};
-	degreeMap= identity;
-	);
-    return (Tdegrees, degreeMap);
+    --a hashtable of these variables and their associated degrees
+    degreeHash:= hashTable (for g in gens degreeRing list {degree g, g});    
+    
+    return (degreeRing, degreeHash);
     )
 
 --------------------------------------------------------------------------
 --method functions--------------------------------------------------------
 --------------------------------------------------------------------------
+opts:= {
+    Projective=> false,
+    DegreeMap=> null,
+    DegreeLift=> null
+    };
 
 jets= method(Options=>opts);
 
@@ -90,50 +90,89 @@ jets(ZZ,Ideal):= o -> (n,I) -> (
     R:= ring I;
     S:= null;--initializes jets ring
     typeName:= if o.Projective then (projets) else (jets);
-    
-    
-    if o.Projective and length unique degrees R != 1 then (
-    	stderr << "
-	warning: variable degrees are not uniform, possible loss of homogeneity" 
-	<< endl;
-    --	error("warning: jets of homogeneous ideals in rings without uniform degree may not be homogeneous");
-	);
+    degreeMap:= if o.Projective then (d -> degree 1_R) else identity;
     
     if not I.cache#? typeName then (
 	S= jets(0,R, Projective=> o.Projective);
 	I.cache#typeName= new CacheTable from {
 	    maxOrder=> 0,
-	    jetsMatrix=> (map(S,R,vars S)) gens I
+	    jetsMatrix=> (map(S,R,vars S,DegreeMap=> degreeMap)) gens I
 	    };
     	);
    
     m:= I.cache#typeName#maxOrder;
+    
     --calculate higher order entries if needed
     if n>m then (
         S= jets(n,R, Projective=> o.Projective);
-    	(Tdegrees, degreeMap):= jetsDegrees (R, Projective=> o.Projective);
-	T:= S[t, Degrees=> Tdegrees, Join=> false]/(ideal(t^(n+1)));
+	
+        --for projective jets of a ring with variables of nonuniform degree
+	specCase:= length unique degrees R != 1 and o.Projective;
+    	(degreeRing, degreeHash):= if specCase then jetsDegrees(n,R) else (null,null);
+	--a ring of degree variables to handle the case of nonuniform degrees 
+	--in projective jets 
+	U:= S;
+	if specCase then (
+	    U= degreeRing;
+	    varsHash:= hashTable(for v in gens R list ({v, degreeHash#(degree v)}));
+	    );
+	
+   	--substitution ring for jets calculations and a matrix of generators
+	T:= U[t, 
+	      Degrees=> if (o.Projective and not specCase) then {-1 * degree  R_0} else {degree 1_R}, 
+	      Join=> false]/(ideal t^(n+1));
+	Tmatrix:= diagonalMatrix(T, for i from 1 to numgens R list(t));    
+	
+	--if not in the case of nonuniform degrees in 
+	--projective jets, this is simply the identity
+	Umatrix:= if specCase then (
+	    diagonalMatrix(U,values varsHash) 
+	    ) else (
+	    id_(T^(numgens R))
+	    );
+	
+	--generate jets substitution polynomials
 	tempS:= S;
-    	Tpolys:= reverse join(
-	    (for i from 0 to n-1 list(
-		    promote(matrix t^(n-i),T) * vars tempS
+	subMonomials:= reverse join(
+	    (for i from 0 to n-1 list( 
+		    vars tempS * Tmatrix^(n-i) * Umatrix^i
 		    ) do (
 		    tempS= coefficientRing tempS)),
-	    {promote (matrix t^0,T) * vars tempS}
+	    {vars tempS * Umatrix^n}
 	    );
-    	phi:= map(T,R,sum Tpolys,DegreeMap=> degreeMap);
-	(d,c):= coefficients(phi gens I, Monomials=> (basis T)_{0..n});
+        
+	--perform substitution
+	phi:= map(T,R,sum subMonomials, DegreeMap=> degreeMap);
+
+        --sort out t variables
+    	(d,c):= coefficients(phi gens I, Monomials=> basis T);
+        
+    	--sort out u variables if necessary
+	if specCase then (
+	    deHom:= map(U,U, for i from 1 to numgens U list 1_U);
+	    c= deHom lift(c,U);
+	    );
+    
 	resultMatrix:= lift(c,S);
-    	
+
 	--update value in ideal cache
 	I.cache#typeName#jetsMatrix= resultMatrix;
 	I.cache#typeName#maxOrder= n;
 	);
    
-    --retrieve ideal of appropriate order
-    JMatrix:= I.cache#typeName#jetsMatrix; 
-    ideal (JMatrix)^{0..n}
-    )
+   
+    --warning message for special case
+    if specCase then (
+       stderr << "
+       warning: variable degrees nonuniform, possible loss of homogeneity" 
+       << endl;
+       );    	
+   
+   
+   --retrieve ideal of appropriate order
+   JMatrix:= I.cache#typeName#jetsMatrix;
+   ideal (JMatrix)^{0..n}
+   )
 
 --how to store ideal information we caculate here?
 jets(ZZ,RingMap):= o -> (n,phi) -> (
