@@ -1,25 +1,22 @@
 load "jetsMethod.m2"
 load "homTest.m2"
 
-R0= QQ[x,y,z];
+R0= QQ[x,y,z,Degrees=>{3,3,3}];
 S0= QQ[a,b,c];
-f=  map(S0,R0,matrix{{c,a,b}});
-f0= map(S0,R0,matrix{{a^2*b,b*c^2, c^3}},DegreeMap=> d -> 3*d);
+phi= map(S0,R0,matrix{{a^2*b,b*c^2, c^3}});
 
-R1= QQ[x,y,z,Degrees=>{2,3,2}];
-S1= QQ[a,b,c,Degrees=>{3,2,2}];
-g=  map(S1,R1,matrix{{c,a,b}});
-g0= map(S1,R1,matrix{{a^2*b,b*c^2, c^3}},DegreeMap=> d -> 3*d);
+R1= QQ[x,y,z,Degrees=>{5,5,6}];
+S1= QQ[a,b,c,Degrees=>{2,1,2}];
+g0= map(S1,R1,matrix{{a^2*b,b*c^2, c^3}});
 
-R2= QQ[x,y,z,Degrees=> {{1,2},{1,2},{1,2}}];
+R2= QQ[x,y,z,Degrees=> {{3,6},{3,6},{3,6}}];
 S2= QQ[a,b,c,Degrees=> {{1,2},{1,2},{1,2}}];
-h=  map(S2,R2,matrix{{c,a,b}});
-h0= map(S2,R2,matrix{{a^2*b,b*c^2, c^3}},DegreeMap=> d -> 3*d);
+h0= map(S2,R2,matrix{{a^2*b,b*c^2, c^3}});
 
-R3= QQ[x,y,z,Degrees=> {{1,2},{1,3},{1,2}}];
+R3= QQ[x,y,z,Degrees=> {{3,8},{3,6},{3,6}}];
 S3= QQ[a,b,c,Degrees=> {{1,3},{1,2},{1,2}}];
-k=  map(S3,R3,matrix{{c,a,b}});
-k0= map(S3,R3,matrix{{a^2*b,b*c^2, c^3}},DegreeMap=> d -> 3*d);
+k0= map(S3,R3,matrix{{a^2*b,b*c^2, c^3}});
+
 
 n=2
 
@@ -31,10 +28,15 @@ opts:= {
 
 jetsm= opts >> o -> (n,phi) -> (
     
-I:= ideal(phi.matrix);
+    I:= ideal(phi.matrix);
     typeName:= if o.Projective then (projets) else (jets);
-    degreeMap:= if o.DegreeMap===null then phi.cache.DegreeMap else o.DegreeMap;
-    degreeLift:= if o.DegreeLift===null then phi.cache.DegreeLift else o.DegreeLift;
+-*
+    degreeMap:= if o.Projective then (
+	(d -> n*d) * phi.cache.DegreeMap
+	) else (
+	phi.cache.DegreeMap
+	);*-
+    --degreeLift:= if o.DegreeLift===null then phi.cache.DegreeLift else o.DegreeLift;
     
     
     jets(n,I, Projective=> o.Projective);
@@ -43,8 +45,41 @@ I:= ideal(phi.matrix);
     (JS, transferS):= flattenRing jets(n,phi.target, Projective=> o.Projective);
     targs:= transferS (I.cache#typeName#jetsMatrix);
     psi:= map(JS,JR,
-	flatten rsort transpose targs^{0..n},
-	DegreeMap=> degreeMap,
-	DegreeLift=> degreeLift);
+	flatten rsort transpose targs^{0..n});
+--	DegreeLift=> degreeLift,
+--	DegreeMap=> degreeMap);
+
     (inverse transferS) * psi * transferR
+    )
+end
+
+    I:= ideal(phi.matrix);
+
+    degreeMap:=	identity; --d -> n* degree phi.target_0;
+-*
+    degreeMap:= if o.Projective then (
+	(d -> n*d) * phi.cache.DegreeMap
+	) else (
+	phi.cache.DegreeMap
+	);*-
+    --degreeLift:= if o.DegreeLift===null then phi.cache.DegreeLift else o.DegreeLift;
+    
+    
+    jets(n,I, Projective=>true);-- o.Projective);
+    
+--    (JR, transferR):= flattenRing jets(n,phi.source, Projective=>true);-- o.Projective);
+--    (JS, transferS):= flattenRing jets(n,phi.target, Projective=>true);-- o.Projective);
+    JR= jets(n,phi.source,Projective=>true);
+    JS= jets(n,phi.target,Projective=>true);
+    
+    targs:= -*transferS*- (I.cache#projets-*typeName*-#jetsMatrix);
+    psi:= map(JS,JR,
+	flatten rsort transpose targs^{0..n},
+--	DegreeLift=> degreeLift,
+	DegreeMap=> degreeMap);
+
+   result= (inverse transferS) * psi * transferR
+   )
+for i from 0 to n list (
+    jetsm(i,phi)
     )
