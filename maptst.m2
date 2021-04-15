@@ -1,4 +1,4 @@
-load "jetsMethod.m2"
+load "jetsMethodProj.m2"
 load "homTest.m2"
 
 R0= QQ[x,y,z,Degrees=>{3,3,3}];
@@ -9,7 +9,7 @@ R1= QQ[x,y,z,Degrees=>{5,5,6}];
 S1= QQ[a,b,c,Degrees=>{2,1,2}];
 g0= map(S1,R1,matrix{{a^2*b,b*c^2, c^3}});
 
-R2= QQ[x,y,z,Degrees=> {{3,6},{3,6},{3,6}}];
+R2= QQ[x,y,z]
 S2= QQ[a,b,c,Degrees=> {{1,2},{1,2},{1,2}}];
 h0= map(S2,R2,matrix{{a^2*b,b*c^2, c^3}});
 
@@ -27,17 +27,8 @@ opts:= {
     };
 
 jetsm= opts >> o -> (n,phi) -> (
-    
     I:= ideal(phi.matrix);
     typeName:= if o.Projective then (projets) else (jets);
--*
-    degreeMap:= if o.Projective then (
-	(d -> n*d) * phi.cache.DegreeMap
-	) else (
-	phi.cache.DegreeMap
-	);*-
-    --degreeLift:= if o.DegreeLift===null then phi.cache.DegreeLift else o.DegreeLift;
-    
     
     jets(n,I, Projective=> o.Projective);
     
@@ -51,35 +42,26 @@ jetsm= opts >> o -> (n,phi) -> (
 
     (inverse transferS) * psi * transferR
     )
-end
 
+
+jetsM= opts >> o -> (n,phi) -> (
     I:= ideal(phi.matrix);
+    typeName:= if o.Projective then (projets) else (jets);
 
-    degreeMap:=	identity; --d -> n* degree phi.target_0;
--*
-    degreeMap:= if o.Projective then (
-	(d -> n*d) * phi.cache.DegreeMap
-	) else (
-	phi.cache.DegreeMap
-	);*-
-    --degreeLift:= if o.DegreeLift===null then phi.cache.DegreeLift else o.DegreeLift;
+    jets(n,I, Projective=> o.Projective);
     
+    JR= jets(n,phi.source, Projective=> o.Projective);
+    JS= jets(n,phi.target, Projective=> o.Projective);
     
-    jets(n,I, Projective=>true);-- o.Projective);
-    
---    (JR, transferR):= flattenRing jets(n,phi.source, Projective=>true);-- o.Projective);
---    (JS, transferS):= flattenRing jets(n,phi.target, Projective=>true);-- o.Projective);
-    JR= jets(n,phi.source,Projective=>true);
-    JS= jets(n,phi.target,Projective=>true);
-    
-    targs:= -*transferS*- (I.cache#projets-*typeName*-#jetsMatrix);
+    targs:= (I.cache#typeName#jetsMatrix);
     psi:= map(JS,JR,
-	flatten rsort transpose targs^{0..n},
+	flatten rsort transpose targs^{0..n});
 --	DegreeLift=> degreeLift,
-	DegreeMap=> degreeMap);
-
-   result= (inverse transferS) * psi * transferR
+--	DegreeMap=> degreeMap);
    )
-for i from 0 to n list (
-    jetsm(i,phi)
+
+test= (n,phi) -> (
+    print("Affine:\t\t" | toString (jetsm(n,phi)===jetsM(n,phi)));
+    print("Projective:\t" | toString (jetsm(n,phi,Projective=>true)===jetsM(n,phi,Projective=>true)));
     )
+

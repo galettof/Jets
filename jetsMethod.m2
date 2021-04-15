@@ -1,5 +1,7 @@
 opts:= {
     Projective=> false
+--    DegreeMap=> null,
+--    DegreeLift=> null
     };
 
 ---------------------------------------------------------------------------
@@ -21,10 +23,11 @@ jetsVariables= (n,R) -> (
     varNames= apply(varNames,value)
     )
 
---generate degree list for projective jets variables
+--generate degree list for jets variables
 degGenerator= (n,R) -> (
-    L:= if isRing R then degrees R else R;
-    if n==1 then L else (for a in L list(apply(a, i -> i*n)))
+    for d in degrees R list (
+	for l in d list n
+	)
     )
 
 --generate degrees/map for truncation ring in ideal calculation
@@ -52,10 +55,10 @@ jets(ZZ,Ring):= o -> (n,R) -> (
     --name to assign hashtable stored in basering depending on whether
     --are working in the projective or affine case
     typeName:= if o.Projective then (projets) else (jets);
-    degMultiplier:= null;
+    jetDegs:= null;
+    
     if not R#? typeName then (
-	degMultiplier= if o.Projective then 0 else 1;
-	jetDegs:= degGenerator(degMultiplier, R);
+	jetDegs= if o.Projective then degGenerator(0, R) else degrees R;
 	R#typeName= new CacheTable from {
 	    maxOrder=> 0,
 	    jetsRing=> coefficientRing R[jetsVariables(0,R), 
@@ -71,10 +74,10 @@ jets(ZZ,Ring):= o -> (n,R) -> (
     --this is inefficient in the affine case
     if n>m then (
 	for i from m+1 to n do(
-    	    degMultiplier= if o.Projective then i else 1;
+    	    jetDegs= if o.Projective then degGenerator(i,R) else degrees R; 
 	    S= S[jetsVariables(i,R), 
 		Join=> false, 
-		Degrees=> degGenerator(degMultiplier,R)];
+		Degrees=> jetDegs];
             );
      	R#typeName#maxOrder= n;
 	R#typeName#jetsRing= S;
@@ -90,11 +93,6 @@ jets(ZZ,Ideal):= o -> (n,I) -> (
     R:= ring I;
     S:= null;--initializes jets ring
     typeName:= if o.Projective then (projets) else (jets);
-    
-    
-    if o.Projective and length unique degrees R != 1 then (
-   	error("projective jets of homogeneous ideals in rings without uniform degree may not be homogeneous");
-	);
     
     if not I.cache#? typeName then (
 	S= jets(0,R, Projective=> o.Projective);
@@ -135,15 +133,19 @@ jets(ZZ,Ideal):= o -> (n,I) -> (
 --how to store ideal information we caculate here?
 jets(ZZ,RingMap):= o -> (n,phi) -> (
     I:= ideal(phi.matrix);
-    jets(n,I);
+    typeName:= if o.Projective then (projets) else (jets);
+
+    jets(n,I, Projective=> o.Projective);
     
+    JR= jets(n,phi.source, Projective=> o.Projective);
+    JS= jets(n,phi.target, Projective=> o.Projective);
     
-    (JR, transferR):= flattenRing jets(n,phi.source);
-    (JS, transferS):= flattenRing jets(n,phi.target);
-    targs:= transferS (I.cache.jets#jetsMatrix);
-    psi:= map(JS,JR,flatten targs^{0..n});
-    (inverse transferS) * psi * transferR
-    )
+    targs:= (I.cache#typeName#jetsMatrix);
+    psi:= map(JS,JR,
+	flatten rsort transpose targs^{0..n})
+--	DegreeLift=> degreeLift,
+--	DegreeMap=> degreeMap);
+   )
     
 ---------------------------------------------------------------------------
 --secondary functions--------------------------------------------------------
