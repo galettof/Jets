@@ -66,7 +66,6 @@ jets(ZZ,Ring):= o -> (n,R) -> (
 					 Degrees=> jetDegs],
 	    }
 	);
-    
     m:= R#typeName#maxOrder;
     S:= R#typeName#jetsRing;
     
@@ -85,7 +84,12 @@ jets(ZZ,Ring):= o -> (n,R) -> (
 	for i from 0 to m-n-1 do (
 	    S= coefficientRing S;
 	    )
-	); 
+	);
+    
+    S#jets= new CacheTable from {
+	jetsBase=> R,
+	projective=> o.Projective
+	}; 
     return S;
     )
 
@@ -117,32 +121,47 @@ jets(ZZ,Ideal):= o -> (n,I) -> (
 	    {promote (matrix t^0,T) * vars tempS}
 	    );
     	phi:= map(T,R,sum Tpolys,DegreeMap=> degreeMap);
-	(d,c):= coefficients(phi gens I, Monomials=> (basis T)_{0..n});
+	(d,c):= coefficients(phi gens I);
 	resultMatrix:= lift(c,S);
     	
 	--update value in ideal cache
 	I.cache#typeName#jetsMatrix= resultMatrix;
 	I.cache#typeName#maxOrder= n;
+	m=n;
 	);
    
     --retrieve ideal of appropriate order
     JMatrix:= I.cache#typeName#jetsMatrix; 
-    ideal (JMatrix)^{0..n}
+    ideal (JMatrix)^{m-n..m}
     )
 
 --how to store ideal information we caculate here?
 jets(ZZ,RingMap):= o -> (n,phi) -> (
     I:= ideal(phi.matrix);
     typeName:= if o.Projective then (projets) else (jets);
-
-    jets(n,I, Projective=> o.Projective);
-    
     JR= jets(n,phi.source, Projective=> o.Projective);
     JS= jets(n,phi.target, Projective=> o.Projective);
+    targets:= null;
+    jets(0,I,Projective=> o.Projective);
     
-    targs:= (I.cache#typeName#jetsMatrix);
+    if (not phi.cache#? typeName) then (
+	phi.cache#typeName= new CacheTable from {
+	    maxOrder=> 0,
+    	    jetsMap=> map(JS,JR,I.cache#typeName#jetsMatrix)
+	    };
+	);
+    
+    m= phi.cache#typeName#maxOrder;
+    
+    if m < n then (
+	jets(n,I, Projective=> o.Projective);
+    	targets= (I.cache#typeName#jetsMatrix);	
+    	) else (
+    	targets= phi.cache#typeName#jetsMatrix^{m-n..m};
+	);
+
     psi:= map(JS,JR,
-	flatten rsort transpose targs^{0..n})
+	flatten transpose targets)
 --	DegreeLift=> degreeLift,
 --	DegreeMap=> degreeMap);
    )
