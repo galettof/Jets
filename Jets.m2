@@ -25,6 +25,10 @@ newPackage(
 	     Name => "Federico Galetto",
 	     Email => "galetto.federico@gmail.com",
 	     HomePage => "http://math.galetto.org"
+	     },
+	 {
+	     Name=> "Nicholas Iammarino",
+	     Email=> "nickiammarino@gmail.com"
 	     }
 	   },
      Headline => "compute jet functors",
@@ -33,12 +37,19 @@ newPackage(
      )
 
 -- all user facing symbols, methods, and types must be exported
+importFrom(MinimalPrimes, {"radical"});
+
+
 export {
     "jets",
     "maxOrder",
     "jetsBase",
     "jetsRing",
-    "projets"
+    "projet",
+    "jet",
+    "jetsMatrix",
+    "jetsRadical",
+    "jetsProjection"
     }
 
 opts= {
@@ -92,13 +103,16 @@ jetsDegrees= opts >> o -> R -> (
 --method functions--------------------------------------------------------
 --------------------------------------------------------------------------
 
+
+--Jets (Main Method)------------------------------------------------------
+
 jets= method(Options=>opts);
 
 jets(ZZ,Ring):= o -> (n,R) -> (
     --name to assign hashtable stored in basering depending on whether
     --are working in the projective or affine case
-    typeName:= if o.Projective then (projets) else (jets);
-    jetDegs:= null;
+    typeName:= if o.Projective then (projet) else (jet);
+    jetDegs:= null;--initialize degree list for jets variables
     
     if not R#? typeName then (
 	jetDegs= if o.Projective then degGenerator(0, R) else degrees R;
@@ -129,12 +143,120 @@ jets(ZZ,Ring):= o -> (n,R) -> (
 	    )
 	);
     
-    S#jets= new CacheTable from {
+    S#jet= new CacheTable from {
 	(symbol jetsBase)=> R,
 	(symbol Projective)=> o.Projective
 	}; 
     return S;
     )
+
+jets(ZZ,Ideal):= o -> (n,I) -> (
+    R:= ring I;
+    S:= null;--initializes jets ring
+    t:= local t;--initializes truncation variable
+    
+    typeName:= if o.Projective then (projet) else (jet);
+    
+    if not I.cache#? typeName then (
+	S= jets(0,R, Projective=> o.Projective);
+	I.cache#typeName= new CacheTable from {
+	    maxOrder=> 0,
+	    jetsMatrix=> (map(S,R,vars S)) gens I
+	    };
+    	);
+   
+    m:= I.cache#typeName#maxOrder;
+
+    --calculate higher order entries if needed
+    if n>m then (
+        S= jets(n,R, Projective=> o.Projective);
+    	(Tdegrees, degreeMap):= jetsDegrees (R, Projective=> o.Projective);
+	T:= S[t, Degrees=> Tdegrees, Join=> false]/(ideal(t^(n+1)));
+	tempS:= S;
+    	Tpolys:= reverse join(
+	    (for i from 0 to n-1 list(
+		    promote(matrix t^(n-i),T) * vars tempS
+		    ) do (
+		    tempS= coefficientRing tempS)),
+	    {promote (matrix t^0,T) * vars tempS}
+	    );
+    	phi:= map(T,R,sum Tpolys,DegreeMap=> degreeMap);
+	(d,c):= coefficients(phi gens I);
+	resultMatrix:= lift(c,S);
+    	
+	--update value in ideal cache
+	I.cache#typeName#jetsMatrix= resultMatrix;
+	I.cache#typeName#maxOrder= n;
+	m=n;
+	);
+   
+    --retrieve ideal of appropriate order
+    JMatrix:= I.cache#typeName#jetsMatrix; 
+    ideal (JMatrix)^{m-n..m}
+    )
+
+--how to store ideal information we caculate here?
+jets(ZZ,RingMap):= o -> (n,phi) -> (
+    I:= ideal(phi.matrix);
+    typeName:= if o.Projective then (projet) else (jet);
+    JR:= jets(n,phi.source, Projective=> o.Projective);
+    JS:= jets(n,phi.target, Projective=> o.Projective);
+    targets:= null;
+    jets(0,I,Projective=> o.Projective);
+    
+    if (not phi.cache#? typeName) then (
+	phi.cache#typeName= new CacheTable from {
+	    maxOrder=> 0,
+    	    jetsMatrix=> map(JS,JR,I.cache#typeName#jetsMatrix)
+	    };
+	);
+    
+    m:= phi.cache#typeName#maxOrder;
+    
+    if m < n then (
+	jets(n,I, Projective=> o.Projective);
+    	targets= (I.cache#typeName#jetsMatrix);	
+    	) else (
+    	targets= phi.cache#typeName#jetsMatrix^{m-n..m};
+	);
+
+    psi:= map(JS,JR,
+	flatten transpose targets)
+--	DegreeLift=> degreeLift,
+--	DegreeMap=> degreeMap);
+   )
+
+
+---Secondary Methods--------------------------------------------------
+
+--to reduce computation time for monomial jet ideals  (cite article of 
+--Goward and Smith)
+jetsRadical= method(); 
+
+jetsRadical(ZZ,Ideal):= (n,I) -> (
+    if isMonomialIdeal I then (
+	baseIdeal:= jets(n,I);
+	R:= ring I;
+	gensList:= flatten entries gens baseIdeal;
+	termList:= apply(gensList, t-> terms(coefficientRing R, t));
+	squarefreeGens:= apply(apply(flatten termList, support),product);
+	ideal(squarefreeGens)
+	) else (
+	radical jets(n,I)
+	)
+    )
+
+
+--to create a map sending elements of a jets ring to a jets ring of
+--higher order
+jetsProjection= method(Options=>opts);
+
+jetsProjection(ZZ,ZZ,Ring):= o -> (t,s,R) -> (
+
+    if t < s then error("whoops");    
+    (map(jets(t,R,Projective=> o.Projective),jets(s,R,Projective=> o.Projective)))
+    ) 
+
 
 ----------------------------------------------------------------------
 -- Documentation
@@ -143,19 +265,288 @@ jets(ZZ,Ring):= o -> (n,R) -> (
 beginDocumentation()
 
 doc ///
+
+Node
+    Key
+    	Jets
+    Headline
+    	Method for applying jets functor to various objects	
+    Subnodes
+    	jets
+	jetsProjection
+	jetsRadical
+	[jets,Projective]
+	"Storing Computations"
+
+Node
     Key
     	jets
+    Headline
+    	main method of Jets package
+    Subnodes	
+	(jets,ZZ,Ring)
+	(jets,ZZ,Ideal)
+	(jets,ZZ,RingMap)
+	
+Node
+    Key
+    	"Storing Computations"
+    Description
+    	Text
+	    Having computed the jets of an object, we store the results
+	    in a @TO CacheTable@ in the parent object to simplify future computation.
+    	Example
+	    R= QQ[x,y]
+	    I= ideal (x^2 - y)
+	    jets(3,I)
+	    keys I.cache.jet
+    Subnodes
+	jet
+	projet
+	jetsRing
+	maxOrder
+	jetsMatrix
+	jetsBase    
+
+
+Node
+    Key
 	(jets,ZZ,Ring)
     Headline
     	compute jets of a polynomial ring
+    Usage
+    	jets (n,R)
+    Inputs
+    	n:ZZ
+    	R:Ring
+    Outputs
+    	:Ring
+       	 of jets variables of order @TT "n"@ generated by the variables of @TT "R"@
     Description
     	Text
 	    This function is provided by the package
 	    @TO Jets@.
     	Example	    
-	    R = QQ[x,y,z]
-	    jets(2,R)
-	    describe R
+	    R= QQ[x,y,z]
+	    JR= jets(2,R)
+	    describe JR
+
+Node
+    Key
+	(jets,ZZ,Ideal)
+    Headline
+    	compute jets of a an ideal in a polynomial ring
+    Usage
+    	jets (n,I)
+    Inputs
+    	n:ZZ
+	I:Ideal
+    Outputs
+        :Ideal
+	 generated by the jets of the generators of @TT "I"@
+    Description
+    	Text
+	    This function is provided by the package
+	    @TO Jets@.
+    	Example	    
+	    R= QQ[x,y,z]
+	    I= ideal (x^2-y*z)
+    	    jets(4,I)
+    	    I.cache#jet#jetsMatrix
+
+Node
+    Key
+	(jets,ZZ,RingMap)
+    Headline
+    	the jets of a homomorphism of rings
+    Usage
+    	jets (n,f)
+    Inputs
+	n:ZZ
+	f:RingMap
+	 a map from a ring @TT "R"@ to a ring @TT "S"@
+    Outputs
+        :RingMap
+	 from the jets of order @TT "n"@ of ring @TT "R"@ to the jets of order 
+	 @TT "n"@ of a ring @TT "S"@
+    Description
+    	Text
+	    This function is provided by the package
+	    @TO Jets@.
+    	Example	    
+	    R= QQ[x,y]
+	    S= QQ[a,b]
+	    f= map(S,R,{b^2, 3*a})
+	    Jf= jets(2,f)
+	    Jf (y1 + 2*x2^2 + x0*y0)
+
+Node
+    Key
+    	jet
+    Headline
+    	hashtable key
+    Description
+    	Text
+	    @TO CacheTable@ for storing information on jets constructed
+	    from a base object.  For @TO Ring@, stored as @TT "x.*"@  For 
+	    @TO RingMap@ and @TO Ideal@ stored as @TT "x.cache.*"@  Also used
+	    to store basic information in @TO (jets,ZZ,Ring)@.
+    SeeAlso
+	projet
+	jetsRing
+	maxOrder
+	jetsMatrix
+	jetsBase
+
+Node
+    Key
+    	projet
+    Headline
+    	hashtable key
+    Description
+    	Text
+	    @TO CacheTable@ for storing information on the projective 
+	    jets of the base object.  For @TO Ring@, stored as @TT "x.*"@.  
+	    For @TO RingMap@ and @TO Ideal@ stored as @TT "x.cache.*"@
+    SeeAlso
+    	jet
+	jetsRing
+	maxOrder
+	jetsMatrix
+	jetsBase
+
+Node
+    Key
+    	jetsRing
+    Headline
+    	hashtable value
+    Description
+    	Text
+    	    The @TO (jets,ZZ,Ring)@ of maximum order computed for a particular base
+	    ring.  Stored in @TO jet@ or @TO projet@ of the base.
+    SeeAlso
+    	jet
+	projet
+	maxOrder
+	jetsMatrix
+	jetsBase
+
+Node
+    Key
+    	jetsMatrix
+    Headline
+    	hashtable value
+    Description
+    	Text
+	    A matrix of jets elements which generate a @TO (jets,ZZ,Ideal)@
+	    or serve as targets for a @TO (jets,ZZ,RingMap)@.  Stored in 
+	    @TO jet@ or @TO projet@ of the base.
+    SeeAlso
+    	jet
+	projet
+	jetsRing
+	maxOrder
+	jetsBase
+
+Node
+    Key
+    	maxOrder
+    Headline
+    	hashtable value
+    Description
+    	Text
+	    The maximum order of jets computed for a particular object.  Stored
+	    in @TO jet@ or @TO projet@ of the base object.
+    SeeAlso
+    	jet
+	projet
+	jetsRing
+	jetsMatrix
+	jetsBase
+
+Node
+    Key
+    	jetsBase
+    Headline
+    	hashtable value
+    Description
+    	Text
+    	    The base ring of a @TO (jets,ZZ,Ring)@.
+    SeeAlso
+    	jet
+	projet
+	jetsRing
+	maxOrder
+	jetsMatrix
+
+Node
+    Key
+    	[jets,Projective]
+   	[jetsProjection,Projective]
+    Description
+    	Text
+	    Use projective case degrees for varibales in jets objects.(cite Vojta)
+	    
+Node
+    Key
+    	jetsRadical
+    Headline
+    	compute radical jets ideal 
+    Subnodes
+    	(jetsRadical,ZZ,Ideal)
+	
+Node
+    Key
+    	(jetsRadical,ZZ,Ideal)
+    Usage
+    	jetsRadical(n,I)
+    Inputs
+    	n:ZZ
+	I:Ideal
+    Outputs
+        :Ideal
+	 generated by the jets of the generators of @TT "I"@.
+    Description
+   	Text
+	    A shortcut to calculate radical jets of a monomial ideal
+	    (cite article of Goward and Smith).  If the 
+	    input is not a monomial ideal this function uses the @TO radical@ function from
+	    the @TO MinimalPrimes@ package.
+
+Node
+    Key
+    	jetsProjection
+    Headline
+    	a map between jets rings
+    Subnodes
+    	(jetsProjection,ZZ,ZZ,Ring)
+	
+Node
+    Key
+    	(jetsProjection,ZZ,ZZ,Ring)
+    Headline
+    	computes projection map
+    Usage
+    	jets(t,s,R)
+    Inputs
+    	t:ZZ
+	s:ZZ
+	R:Ring
+    Outputs
+    	:RingMap
+	 between jets orders
+    Description
+    	Text
+	    Generates a map from @TO (jets,ZZ,Ring)@ of order @TT "s"@ to
+	    @TO (jets,ZZ,Ring)@ of order @TT "t"@.  Throws an error if @TT "t<s"@.
+	    
+    	Example
+	    R=QQ[x,y]
+	    f= jetsProjection(5,2,R)
+	    use jets(2,R)
+	    p= (x2 + 2*x1*y1 + x0*y2^2)
+	    f p
+	    
 ///
 
 end

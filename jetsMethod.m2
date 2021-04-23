@@ -96,6 +96,7 @@ jets(ZZ,Ring):= o -> (n,R) -> (
 jets(ZZ,Ideal):= o -> (n,I) -> (
     R:= ring I;
     S:= null;--initializes jets ring
+    t:= local t;--initializes truncation variable
     typeName:= if o.Projective then (projets) else (jets);
     
     if not I.cache#? typeName then (
