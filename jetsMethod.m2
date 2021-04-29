@@ -114,14 +114,14 @@ jets(ZZ,Ideal):= o -> (n,I) -> (
     	(Tdegrees, degreeMap):= jetsDegrees (R, Projective=> o.Projective);
 	T:= S[t, Degrees=> Tdegrees, Join=> false]/(ideal(t^(n+1)));
 	tempS:= S;
-    	Tpolys:= reverse join(
+    	Tpolys:= sum reverse join(
 	    (for i from 0 to n-1 list(
 		    promote(matrix t^(n-i),T) * vars tempS
 		    ) do (
 		    tempS= coefficientRing tempS)),
 	    {promote (matrix t^0,T) * vars tempS}
 	    );
-    	phi:= map(T,R,sum Tpolys,DegreeMap=> degreeMap);
+    	phi:= map(T,R, Tpolys,DegreeMap=> degreeMap);
 	(d,c):= coefficients(phi gens I);
 	resultMatrix:= lift(c,S);
     	
