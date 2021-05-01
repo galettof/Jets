@@ -277,6 +277,51 @@ jetsProjection(ZZ,ZZ,Ring):= o -> (t,s,R) -> (
 
 beginDocumentation()
 
+TEST ///
+    R= QQ[x,y,z, Degrees=> {2,3,1}];
+    assert(degrees jets(2,R)==={{2}, {3}, {1}})
+    assert(degrees jets(2,R,Projective=> true) === {{2}, {2}, {2}})
+    I= ideal(x*y, x*z^2);
+    J= ideal(x^3-y*z^3, y+x*z);
+    assert(isHomogeneous jets(2,I))
+    assert(isHomogeneous jets(2,I,Projective=>true))
+    assert(isHomogeneous jets(2,J))
+    assert(isHomogeneous jets(2,J,Projective=>true))
+    X= radical jets(2,I);
+    Y= jetsRadical(2,I);
+    assert(X == Y)
+    assert(mingens X === mingens Y);
+    S= QQ[a,b,c,Degrees=>{9,7,7}];
+    phi= map(R,S,{x^3*y + z^9, x^2*y + y^2*z, x*y*z^2});
+    f= jets(2,phi);
+    assert(isHomogeneous f)
+    testPoly= f(a0^2 + b2*c1);
+    verifyPoly= ((x0^3*z0^2+2*x0*y0*z0^3)*y1+(x0^2*y0*z0^2+2*y0^2*z0^3)*x1+(2*x0^3*y0*z0+4*x0*y0^2*z0^2)*z1)*y2+(2*x0^2*y0*z0^2*y1+2*x0*y0^2*z0^2*x1+4*x0^2*y0^2*z0*z1)*x2+(x0*y0^2*z0^2*y1+y0^3*z0^2*x1+2*x0*y0^3*z0*z1)*z2+x0*z0^3*y1^3+(2*x0^2*z0^2+y0*z0^3)*x1*y1^2+3*x0*y0*z0^2*x1^2*y1+4*x0*y0*z0^2*y1^2*z1+y0^2*z0^2*x1^3+(4*x0^2*y0*z0+2*y0^2*z0^2)*x1*y1*z1+2*x0*y0^2*z0*x1^2*z1+4*x0*y0^2*z0*y1*z1^2+x0^6*y0^2+2*x0^3*y0*z0^9+z0^18;
+    assert(isHomogeneous jets(2,phi, Projective=> true))
+///
+--    assert(verifyPoly == testPoly)
+
+TEST ///
+R= QQ[x,y,z, Degrees=> {2,3,1}];
+assert(degrees jets(2,R)==={{2}, {3}, {1}})
+assert(degrees jets(2,R,Projective=> true) === {{2}, {2}, {2}})
+I= ideal(x*y, x*z^2);
+J= ideal(x^3-y*z^3, y+x*z);
+assert(isHomogeneous jets(2,I))
+assert(isHomogeneous jets(2,I,Projective=>true))
+assert(isHomogeneous jets(2,J))
+assert(isHomogeneous jets(2,J,Projective=>true))
+X= radical jets(2,I);
+Y= jetsRadical(2,I);
+assert(X == Y)
+assert(mingens X === mingens Y);
+S= QQ[a,b,c,Degrees=>{9,7,7}];
+phi= map(R,S,{x^3*y + z^9, x^2*y + y^2*z, x*y*z^2});
+f= jets(2,phi);
+assert(isHomogeneous jets(2,phi))
+assert(isHomogeneous jets(2,phi, Projective=> true))
+///
+
 doc ///
 
 Node

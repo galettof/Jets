@@ -21,12 +21,12 @@ testIdeal= (n,I) -> (
     IA:= jets(n,I);
     print("Affine Case:");
     print("\tHomogeneous Ideal: " | toString isHomogeneous IA);
-    print("\tHomogeneous Matrix: " | toString isHomogeneous I.cache#jets#jetsMatrix);
+    print("\tHomogeneous Matrix: " | toString isHomogeneous I.cache#jet#jetsMatrix);
     
     IP:= jets(n,I,Projective=>true);
     print("Projective Case:");
     print("\tHomogeneous Ideal: " | toString isHomogeneous IA);
-    print("\tHomogeneous Matrix: " | toString isHomogeneous I.cache#projets#jetsMatrix);
+    print("\tHomogeneous Matrix: " | toString isHomogeneous I.cache#projet#jetsMatrix);
     )
 
 testMap= (n,f) -> (
