@@ -137,6 +137,13 @@ jets(ZZ,Ideal):= o -> (n,I) -> (
     )
 
 --how to store ideal information we caculate here?
+jets(ZZ,QuotientRing):= o -> (n,R) -> (
+    I= ideal R;
+    modI= jets(n,I);
+    base= ring modI;
+    base/modI    
+    )
+
 jets(ZZ,RingMap):= o -> (n,phi) -> (
     I:= ideal(phi.matrix);
     typeName:= if o.Projective then (projets) else (jets);

@@ -42,14 +42,15 @@ importFrom(MinimalPrimes, {"radical"});
 
 export {
     "jets",
-    "maxOrder",
+    "jetsMaxOrder",
     "jetsBase",
     "jetsRing",
     "projet",
     "jet",
     "jetsMatrix",
     "jetsRadical",
-    "jetsProjection"
+    "jetsProjection",
+    "jetsInfo"
     }
 
 opts= {
@@ -108,22 +109,25 @@ jetsDegrees= opts >> o -> R -> (
 
 jets= method(Options=>opts);
 
-jets(ZZ,Ring):= o -> (n,R) -> (
+jets(ZZ,PolynomialRing):= o -> (n,R) -> (
     --name to assign hashtable stored in basering depending on whether
     --are working in the projective or affine case
     typeName:= if o.Projective then (projet) else (jet);
     jetDegs:= null;--initialize degree list for jets variables
     
+    if not isCommutative R then error("jets method does not support noncommutative rings");
+    
+
     if not R#? typeName then (
 	jetDegs= if o.Projective then degGenerator(0, R) else degrees R;
 	R#typeName= new CacheTable from {
-	    (symbol maxOrder)=> 0,
+	    (symbol jetsMaxOrder)=> 0,
 	    (symbol jetsRing)=> coefficientRing R[jetsVariables(0,R), 
 		                                 Join=> false,
 					 	 Degrees=> jetDegs],
 	    }
 	);
-    m:= R#typeName#maxOrder;
+    m:= R#typeName#jetsMaxOrder;
     S:= R#typeName#jetsRing;
     
     --build jet ring tower incrementally up to order n
@@ -137,7 +141,7 @@ jets(ZZ,Ring):= o -> (n,R) -> (
 		Join=> false, 
 		Degrees=> jetDegs];
             );
-     	R#typeName#maxOrder= n;
+     	R#typeName#jetsMaxOrder= n;
 	R#typeName#jetsRing= S;
 	) else if m>n then (
 	for i from 0 to m-n-1 do (
@@ -145,7 +149,7 @@ jets(ZZ,Ring):= o -> (n,R) -> (
 	    )
 	);
     
-    S#jet= new CacheTable from {
+    S#jetsInfo= new CacheTable from {
 	(symbol jetsBase)=> R,
 	(symbol Projective)=> o.Projective
 	}; 
@@ -162,12 +166,12 @@ jets(ZZ,Ideal):= o -> (n,I) -> (
     if not I.cache#? typeName then (
 	S= jets(0,R, Projective=> o.Projective);
 	I.cache#typeName= new CacheTable from {
-	    (symbol maxOrder)=> 0,
+	    (symbol jetsMaxOrder)=> 0,
 	    (symbol jetsMatrix)=> (map(S,R,vars S)) gens I
 	    };
     	);
    
-    m:= I.cache#typeName#maxOrder;
+    m:= I.cache#typeName#jetsMaxOrder;
     if n<0 then error("jets order must be a non-negative integer");
     
     --calculate higher order entries if needed
@@ -191,10 +195,10 @@ jets(ZZ,Ideal):= o -> (n,I) -> (
     	phi:= map(T,R,Tpolys,DegreeMap=> degreeMap);
 	(d,c):= coefficients(phi gens I);
 	resultMatrix:= lift(c,S);
-    	
+
 	--update value in ideal cache
 	I.cache#typeName#jetsMatrix= resultMatrix;
-	I.cache#typeName#maxOrder= n;
+	I.cache#typeName#jetsMaxOrder= n;
 	m=n;
 	);
    
@@ -207,25 +211,30 @@ jets(ZZ,Ideal):= o -> (n,I) -> (
 jets(ZZ,RingMap):= o -> (n,phi) -> (
     I:= ideal(phi.matrix);
     typeName:= if o.Projective then (projet) else (jet);
+    if n<0 then error("jets order must be a non-negative integer");
+    
+    -- check whether jets have previously been calculated for this map
+    if (not phi.cache#? typeName) then (
+	jets(0,I, Projective=> o.Projective);
+	phi.cache#typeName= new CacheTable from {
+	    (symbol jetsMaxOrder)=> 0,
+    	    (symbol jetsMatrix)=> (map(jets(0,phi.target, Projective=> o.Projective),
+		    	    	       jets(0,phi.source, Projective=> o.Projective),
+		                       I.cache#typeName#jetsMatrix)).matrix
+	    };
+	);
+
     JR:= jets(n,phi.source, Projective=> o.Projective);
     JS:= jets(n,phi.target, Projective=> o.Projective);
     targets:= null;
-    jets(n,I,Projective=> o.Projective);
     
-    if (not phi.cache#? typeName) then (
-	phi.cache#typeName= new CacheTable from {
-	    (symbol maxOrder)=> n,
-    	    (symbol jetsMatrix)=> (map(JS,JR,I.cache#typeName#jetsMatrix)).matrix
-	    };
-	);
-    
-    --check if lower order jets have already been calculated
-    m:= phi.cache#typeName#maxOrder;
+    --check whether lower order jets have already been calculated
+    m:= phi.cache#typeName#jetsMaxOrder;
     if m < n then (
 	jets(n,I, Projective=> o.Projective);
     	targets= (I.cache#typeName#jetsMatrix);	
-	phi.cache#typeName#maxOrder= n;
---	phi.cache#typeName#jetsMatrix= 
+	phi.cache#typeName#jetsMaxOrder= n;
+	phi.cache#typeName#jetsMatrix= targets;
     	) else (
     	targets= phi.cache#typeName#jetsMatrix^{m-n..m};
 	);
@@ -264,7 +273,7 @@ jetsRadical(ZZ,Ideal):= (n,I) -> (
 --higher order
 jetsProjection= method(Options=>opts);
 
-jetsProjection(ZZ,ZZ,Ring):= o -> (t,s,R) -> (
+jetsProjection(ZZ,ZZ,PolynomialRing):= o -> (t,s,R) -> (
 
     if t < s then error("whoops");    
     if t<0 or s<0 then error("jets orders must be non-negative integers");
@@ -273,37 +282,19 @@ jetsProjection(ZZ,ZZ,Ring):= o -> (t,s,R) -> (
     ) 
 
 
-----------------------------------------------------------------------
--- Documentation
-----------------------------------------------------------------------
 
 beginDocumentation()
-
+----------------------------------------------------------------------
+-- TESTS
+----------------------------------------------------------------------
 TEST ///
     R= QQ[x,y,z];
-    assert(degrees jets(2,R)==={{2}, {3}, {1}})
+    assert(degrees jets(2,R)==={{1}, {1}, {1}})
     assert(degrees jets(2,R,Projective=> true) === {{2}, {2}, {2}})
-    I= ideal(x*y, x*z^2);
-    J= ideal(x^3-y*z^3, y+x*z);
-    assert(isHomogeneous jets(2,I))
+    I=ideal(y-x^2,z-x^3);
+    assert(not(isHomogeneous jets(2,I)))
     assert(isHomogeneous jets(2,I,Projective=>true))
-    assert(isHomogeneous jets(2,J))
-    assert(isHomogeneous jets(2,J,Projective=>true))
-    X= radical jets(2,I);
-    Y= jetsRadical(2,I);
-    assert(X == Y)
-    assert(mingens X === mingens Y);
-    S= QQ[a,b,c,Degrees=>{9,7,7}];
-    phi= map(R,S,{x^3*y + z^9, x^2*y + y^2*z, x*y*z^2});
-    f= jets(2,phi);
-    assert(isHomogeneous f)
-    testPoly= f(a0^2 + b2*c1);
-    verifyPoly= ((x0^3*z0^2+2*x0*y0*z0^3)*y1+(x0^2*y0*z0^2+2*y0^2*z0^3)*x1+(2*x0^3*y0*z0+4*x0*y0^2*z0^2)*z1)*y2+(2*x0^2*y0*z0^2*y1+2*x0*y0^2*z0^2*x1+4*x0^2*y0^2*z0*z1)*x2+(x0*y0^2*z0^2*y1+y0^3*z0^2*x1+2*x0*y0^3*z0*z1)*z2+x0*z0^3*y1^3+(2*x0^2*z0^2+y0*z0^3)*x1*y1^2+3*x0*y0*z0^2*x1^2*y1+4*x0*y0*z0^2*y1^2*z1+y0^2*z0^2*x1^3+(4*x0^2*y0*z0+2*y0^2*z0^2)*x1*y1*z1+2*x0*y0^2*z0*x1^2*z1+4*x0*y0^2*z0*y1*z1^2+x0^6*y0^2+2*x0^3*y0*z0^9+z0^18;
-
-    assert(isHomogeneous jets(2,phi, Projective=> true))
 ///
---    assert(verifyPoly == testPoly)
-
 
 --for non uniform degrees
 TEST ///
@@ -320,13 +311,23 @@ TEST ///
     Y= jetsRadical(2,I);
     assert(X == Y)
     assert(mingens X === mingens Y);
-    S= QQ[a,b,c,Degrees=>{9,7,7}];
-    phi= map(R,S,{x^3*y + z^9, x^2*y + y^2*z, x*y*z^2});
-    f= jets(2,phi);
-    assert(isHomogeneous jets(2,phi))
-    assert(isHomogeneous jets(2,phi, Projective=> true))
 ///
 
+TEST ///
+    R=QQ[x,y, Degrees=> {2,3}];
+    S=QQ[a,b,c, Degrees=> {1,1,2}]
+    phi= map(S,R, {a^2 + c, b*c});
+    f= jets(2,phi);
+    testx= c2+2*a0*a2+a1^2;
+    testy= b0*c2+c0*b2+b1*c1;
+    assert(f x2===testx)
+    assert(f y2===testy)
+    assert(isHomogeneous jets(3,phi))
+    assert(isHomogeneous jets(3,phi,Projective=>true))
+///
+----------------------------------------------------------------------
+-- Documentation
+----------------------------------------------------------------------
 doc ///
 
 Node
@@ -347,7 +348,7 @@ Node
     Headline
     	Compute the jets of an object
     Subnodes	
-	(jets,ZZ,Ring)
+	(jets,ZZ,PolynomialRing)
 	(jets,ZZ,Ideal)
 	(jets,ZZ,RingMap)
 	
@@ -368,23 +369,24 @@ Node
 	jet
 	projet
 	jetsRing
-	maxOrder
+	jetsMaxOrder
 	jetsMatrix
-	jetsBase    
+	jetsBase
+    	jetsInfo    
 
 
 Node
     Key
-	(jets,ZZ,Ring)
+	(jets,ZZ,PolynomialRing)
     Headline
     	compute jets of a polynomial ring
     Usage
     	jets (n,R)
     Inputs
     	n:ZZ
-    	R:Ring
+    	R:PolynomialRing
     Outputs
-    	:Ring
+    	:PolynomialRing
        	 of jets order @TT "n"@.
     Description
     	Text
@@ -416,9 +418,10 @@ Node
 	    @TO Jets@.
     	Example	    
 	    R= QQ[x,y,z]
-	    I= ideal (x*z-y^2)
-    	    jets(4,I)
+	    I= ideal (y-x^2,z-x^3)
+    	    J= jets(3,I);
     	    I.cache#jet#jetsMatrix
+	    netList J_*
 
 Node
     Key
@@ -440,11 +443,12 @@ Node
 	    This function is provided by the package
 	    @TO Jets@.
     	Example	    
-	    R= QQ[x,y]
-	    S= QQ[a,b,c]
-	    f= map(S,R,{a^2-b^2, a*c-b^2})
-	    Jf= jets(2,f)
-	    Jf (y1 + 2*x2^2 + x0*y0)
+	    R= QQ[x,y,z]
+	    S= QQ[t]
+	    f= map(S,R,{t,t^2,t^3})
+	    Jf= jets(2,f);
+	    Jf y1
+	    f.cache#jet#jetsMatrix
 
 Node
     Key
@@ -454,15 +458,16 @@ Node
     Description
     	Text
 	    @TO CacheTable@ for storing information on jets constructed
-	    from a base object.  For @TO Ring@, stored as @TT "x.*"@  For 
+	    from a base object.  For @TO PolynomialRing@, stored as @TT "x.*"@  For 
 	    @TO RingMap@ and @TO Ideal@ stored as @TT "x.cache.*"@  Also used
-	    to store basic information in @TO (jets,ZZ,Ring)@.
+	    to store basic information in @TO (jets,ZZ,PolynomialRing)@.
     SeeAlso
 	projet
 	jetsRing
-	maxOrder
+	jetsMaxOrder
 	jetsMatrix
 	jetsBase
+    	jetsInfo
 
 Node
     Key
@@ -472,14 +477,15 @@ Node
     Description
     	Text
 	    @TO CacheTable@ for storing information on the projective 
-	    jets of the base object.  For @TO Ring@, stored as @TT "x.*"@.  
+	    jets of the base object.  For @TO PolynomialRing@, stored as @TT "x.*"@.  
 	    For @TO RingMap@ and @TO Ideal@ stored as @TT "x.cache.*"@
     SeeAlso
     	jet
 	jetsRing
-	maxOrder
+	jetsMaxOrder
 	jetsMatrix
 	jetsBase
+    	jetsInfo
 
 Node
     Key
@@ -488,15 +494,16 @@ Node
     	hashtable value
     Description
     	Text
-    	    The @TO (jets,ZZ,Ring)@ of highest order computed thus far 
+    	    The @TO (jets,ZZ,PolynomialRing)@ of highest order computed thus far 
 	    for a particular base ring.  Stored in @TO jet@ or @TO projet@ 
 	    of the base.
     SeeAlso
     	jet
 	projet
-	maxOrder
+	jetsMaxOrder
 	jetsMatrix
 	jetsBase
+    	jetsInfo	
 
 Node
     Key
@@ -512,12 +519,13 @@ Node
     	jet
 	projet
 	jetsRing
-	maxOrder
+	jetsMaxOrder
 	jetsBase
-
+    	jetsInfo
+		
 Node
     Key
-    	maxOrder
+    	jetsMaxOrder
     Headline
     	hashtable value
     Description
@@ -530,6 +538,7 @@ Node
 	jetsRing
 	jetsMatrix
 	jetsBase
+    	jetsInfo	
 
 Node
     Key
@@ -538,14 +547,32 @@ Node
     	hashtable value
     Description
     	Text
-    	    The base ring of a @TO (jets,ZZ,Ring)@.  Stored in a jets object 
+    	    The base ring of a @TO (jets,ZZ,PolynomialRing)@.  Stored in a jets object 
 	    for reference.
     SeeAlso
     	jet
 	projet
 	jetsRing
-	maxOrder
+	jetsMaxOrder
 	jetsMatrix
+    	jetsInfo
+	
+Node
+    Key
+    	jetsInfo
+    Headline
+    	hashtable key
+    Description
+    	Text
+    	    @TO CacheTable@ for storing information on the base object within
+	    the jets object.
+    SeeAlso
+    	jet
+	projet
+	jetsRing
+	jetsMatrix
+	jetsBase
+    	jetsMaxOrder
 
 Node
     Key
@@ -579,7 +606,9 @@ Node
 	    A shortcut to calculate radical jets of a monomial ideal
 	    (cite article of Goward and Smith).  If the 
 	    input is not a monomial ideal this function uses the @TO radical@ function from
-	    the @TO MinimalPrimes@ package.
+	    the @TO MinimalPrimes@ package.  Note: this method will not necessarily return
+	    minimal generators unless the generators of the input are squarefree
+	    monomials.
 
 Node
     Key
@@ -587,11 +616,11 @@ Node
     Headline
     	a map between jets rings
     Subnodes
-    	(jetsProjection,ZZ,ZZ,Ring)
+    	(jetsProjection,ZZ,ZZ,PolynomialRing)
 	
 Node
     Key
-    	(jetsProjection,ZZ,ZZ,Ring)
+    	(jetsProjection,ZZ,ZZ,PolynomialRing)
     Headline
     	computes projection map
     Usage
@@ -599,14 +628,14 @@ Node
     Inputs
     	t:ZZ
 	s:ZZ
-	R:Ring
+	R:PolynomialRing
     Outputs
     	:RingMap
 	 between jets orders
     Description
     	Text
-	    Generates an inclusion map from @TO (jets,ZZ,Ring)@ of order @TT "s"@ into
-	    @TO (jets,ZZ,Ring)@ of order @TT "t"@.  Throws an error if @TT "t<s"@.
+	    Generates an inclusion map from @TO (jets,ZZ,PolynomialRing)@ of order @TT "s"@ into
+	    @TO (jets,ZZ,PolynomialRing)@ of order @TT "t"@.  Throws an error if @TT "t<s"@.
 	    
     	Example
 	    R=QQ[x,y]
@@ -614,13 +643,5 @@ Node
 	    use jets(2,R)
 	    p= (x2 + 2*x1*y1 + x0*y2^2)
 	    f p
-	    
 ///
-
-----------------------------------------------------------------------
--- TESTS
-----------------------------------------------------------------------
-
-
-
 end
