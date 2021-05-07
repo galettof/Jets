@@ -210,20 +210,22 @@ jets(ZZ,RingMap):= o -> (n,phi) -> (
     JR:= jets(n,phi.source, Projective=> o.Projective);
     JS:= jets(n,phi.target, Projective=> o.Projective);
     targets:= null;
-    jets(0,I,Projective=> o.Projective);
+    jets(n,I,Projective=> o.Projective);
     
     if (not phi.cache#? typeName) then (
 	phi.cache#typeName= new CacheTable from {
-	    (symbol maxOrder)=> 0,
-    	    (symbol jetsMatrix)=> map(JS,JR,I.cache#typeName#jetsMatrix)
+	    (symbol maxOrder)=> n,
+    	    (symbol jetsMatrix)=> (map(JS,JR,I.cache#typeName#jetsMatrix)).matrix
 	    };
 	);
     
+    --check if lower order jets have already been calculated
     m:= phi.cache#typeName#maxOrder;
-    
     if m < n then (
 	jets(n,I, Projective=> o.Projective);
     	targets= (I.cache#typeName#jetsMatrix);	
+	phi.cache#typeName#maxOrder= n;
+--	phi.cache#typeName#jetsMatrix= 
     	) else (
     	targets= phi.cache#typeName#jetsMatrix^{m-n..m};
 	);
@@ -278,7 +280,7 @@ jetsProjection(ZZ,ZZ,Ring):= o -> (t,s,R) -> (
 beginDocumentation()
 
 TEST ///
-    R= QQ[x,y,z, Degrees=> {2,3,1}];
+    R= QQ[x,y,z];
     assert(degrees jets(2,R)==={{2}, {3}, {1}})
     assert(degrees jets(2,R,Projective=> true) === {{2}, {2}, {2}})
     I= ideal(x*y, x*z^2);
@@ -297,29 +299,32 @@ TEST ///
     assert(isHomogeneous f)
     testPoly= f(a0^2 + b2*c1);
     verifyPoly= ((x0^3*z0^2+2*x0*y0*z0^3)*y1+(x0^2*y0*z0^2+2*y0^2*z0^3)*x1+(2*x0^3*y0*z0+4*x0*y0^2*z0^2)*z1)*y2+(2*x0^2*y0*z0^2*y1+2*x0*y0^2*z0^2*x1+4*x0^2*y0^2*z0*z1)*x2+(x0*y0^2*z0^2*y1+y0^3*z0^2*x1+2*x0*y0^3*z0*z1)*z2+x0*z0^3*y1^3+(2*x0^2*z0^2+y0*z0^3)*x1*y1^2+3*x0*y0*z0^2*x1^2*y1+4*x0*y0*z0^2*y1^2*z1+y0^2*z0^2*x1^3+(4*x0^2*y0*z0+2*y0^2*z0^2)*x1*y1*z1+2*x0*y0^2*z0*x1^2*z1+4*x0*y0^2*z0*y1*z1^2+x0^6*y0^2+2*x0^3*y0*z0^9+z0^18;
+
     assert(isHomogeneous jets(2,phi, Projective=> true))
 ///
 --    assert(verifyPoly == testPoly)
 
+
+--for non uniform degrees
 TEST ///
-R= QQ[x,y,z, Degrees=> {2,3,1}];
-assert(degrees jets(2,R)==={{2}, {3}, {1}})
-assert(degrees jets(2,R,Projective=> true) === {{2}, {2}, {2}})
-I= ideal(x*y, x*z^2);
-J= ideal(x^3-y*z^3, y+x*z);
-assert(isHomogeneous jets(2,I))
-assert(isHomogeneous jets(2,I,Projective=>true))
-assert(isHomogeneous jets(2,J))
-assert(isHomogeneous jets(2,J,Projective=>true))
-X= radical jets(2,I);
-Y= jetsRadical(2,I);
-assert(X == Y)
-assert(mingens X === mingens Y);
-S= QQ[a,b,c,Degrees=>{9,7,7}];
-phi= map(R,S,{x^3*y + z^9, x^2*y + y^2*z, x*y*z^2});
-f= jets(2,phi);
-assert(isHomogeneous jets(2,phi))
-assert(isHomogeneous jets(2,phi, Projective=> true))
+    R= QQ[x,y,z, Degrees=> {2,3,1}];
+    assert(degrees jets(2,R)==={{2}, {3}, {1}})
+    assert(degrees jets(2,R,Projective=> true) === {{2}, {2}, {2}})
+    I= ideal(x*y, x*z^2);
+    J= ideal(x^3-y*z^3, y+x*z);
+    assert(isHomogeneous jets(2,I))
+    assert(isHomogeneous jets(2,I,Projective=>true))
+    assert(isHomogeneous jets(2,J))
+    assert(isHomogeneous jets(2,J,Projective=>true))
+    X= radical jets(2,I);
+    Y= jetsRadical(2,I);
+    assert(X == Y)
+    assert(mingens X === mingens Y);
+    S= QQ[a,b,c,Degrees=>{9,7,7}];
+    phi= map(R,S,{x^3*y + z^9, x^2*y + y^2*z, x*y*z^2});
+    f= jets(2,phi);
+    assert(isHomogeneous jets(2,phi))
+    assert(isHomogeneous jets(2,phi, Projective=> true))
 ///
 
 doc ///
