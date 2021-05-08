@@ -1,24 +1,33 @@
 load "jetsMethod.m2"
 
 R0=QQ[x,y,z,w];
-I0= ideal (x^2);
-K=ideal(x^2,y^3);
+K= ideal(x,y,z)
 
+I0= ideal x;
+R1=R0/I0;
 
-R=R0/I0;
-n=2;
+I1= ideal y;
+R2=R1/I1;
 
-J= ideal y^3;
-T=R/J;
-V=R0/K;
+I2= ideal z;
+R3= R2/I2;
 
+S=R0/K
 
 jetsQ= {Projective=> true} >> o -> (n,R) -> (
-    jetGens= presentation R;
-    I= jets(n,ideal(jetGens));
-    base= ring I;
+    jetGens:= presentation R;
+    I:= jets(n,ideal(jetGens));
+    base:= ring I;
     base/I	
     )
+
+end
+restart
+load "jetsQR.m2"
+
+
+
+
 
     
 

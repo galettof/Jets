@@ -138,9 +138,12 @@ jets(ZZ,Ideal):= o -> (n,I) -> (
 
 --how to store ideal information we caculate here?
 jets(ZZ,QuotientRing):= o -> (n,R) -> (
-    I= ideal R;
-    modI= jets(n,I);
-    base= ring modI;
+    --this recursion should only be dont if previous jets have not been
+    --calculated.  Try jets(5,R) then jets(2,R) to see how recursion fails for
+    --higher tier quotient rings.  Perhaps store info in base ring by tier.
+    I:= ideal R;
+    modI:= jets(n,I);
+    base:= ring modI;
     base/modI    
     )
 

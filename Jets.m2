@@ -110,13 +110,13 @@ jetsDegrees= opts >> o -> R -> (
 jets= method(Options=>opts);
 
 jets(ZZ,PolynomialRing):= o -> (n,R) -> (
+    if n<0 then error("jets order must be a non-negative integer");
+    if not isCommutative R then error("jets method does not support noncommutative rings");
+    
     --name to assign hashtable stored in basering depending on whether
     --are working in the projective or affine case
     typeName:= if o.Projective then (projet) else (jet);
     jetDegs:= null;--initialize degree list for jets variables
-    
-    if not isCommutative R then error("jets method does not support noncommutative rings");
-    
 
     if not R#? typeName then (
 	jetDegs= if o.Projective then degGenerator(0, R) else degrees R;
@@ -132,7 +132,7 @@ jets(ZZ,PolynomialRing):= o -> (n,R) -> (
     
     --build jet ring tower incrementally up to order n
     --this is inefficient in the affine case
-    if n<0 then error("jets order must be a non-negative integer");
+
 
     if n>m then (
 	for i from m+1 to n do(
@@ -157,6 +157,8 @@ jets(ZZ,PolynomialRing):= o -> (n,R) -> (
     )
 
 jets(ZZ,Ideal):= o -> (n,I) -> (
+    if n<0 then error("jets order must be a non-negative integer");
+
     R:= ring I;
     S:= null;--initializes jets ring
     t:= local t;--initializes truncation variable
@@ -172,7 +174,6 @@ jets(ZZ,Ideal):= o -> (n,I) -> (
     	);
    
     m:= I.cache#typeName#jetsMaxOrder;
-    if n<0 then error("jets order must be a non-negative integer");
     
     --calculate higher order entries if needed
     if n>m then (
@@ -418,7 +419,7 @@ Node
 	    @TO Jets@.
     	Example	    
 	    R= QQ[x,y,z]
-	    I= ideal (y-x^2,z-x^3)
+	    I= ideal (x^3 + y^3 - 3*x*y)
     	    J= jets(3,I);
     	    I.cache#jet#jetsMatrix
 	    netList J_*
