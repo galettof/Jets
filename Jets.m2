@@ -276,7 +276,7 @@ jetsProjection= method(Options=>opts);
 
 jetsProjection(ZZ,ZZ,PolynomialRing):= o -> (t,s,R) -> (
 
-    if t < s then error("whoops");    
+    if t < s then error("first argument must be less than or equal to the second");    
     if t<0 or s<0 then error("jets orders must be non-negative integers");
 
     (map(jets(t,R,Projective=> o.Projective),jets(s,R,Projective=> o.Projective)))
