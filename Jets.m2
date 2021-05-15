@@ -41,6 +41,7 @@ importFrom(MinimalPrimes, {"radical"});
 
 
 export {
+    "JJ",
     "jets",
     "jetsMaxOrder",
     "jetsBase",
@@ -53,7 +54,7 @@ export {
     "jetsInfo"
     }
 
-opts= {
+jetsOptions= {
     Projective=> false
 --    DegreeMap=> null,
 --    DegreeLift=> null
@@ -86,7 +87,7 @@ degGenerator= (n,R) -> (
     )
 
 --generate degrees/map for truncation ring in ideal calculation
-jetsDegrees= opts >> o -> R -> (
+jetsDegrees= jetsOptions >> o -> R -> (
     Tdegrees:= null;
     degreeMap:= null;
     
@@ -107,7 +108,7 @@ jetsDegrees= opts >> o -> R -> (
 
 --Jets (Main Method)------------------------------------------------------
 
-jets= method(Options=>opts);
+jets= method(Options=>jetsOptions);
 
 jets(ZZ,PolynomialRing):= o -> (n,R) -> (
     if n<0 then error("jets order must be a non-negative integer");
@@ -205,7 +206,15 @@ jets(ZZ,Ideal):= o -> (n,I) -> (
    
     --retrieve ideal of appropriate order
     JMatrix:= I.cache#typeName#jetsMatrix; 
-    ideal (JMatrix)^{m-n..m}
+    f:= map(jets(n,R),jets(m,R));
+    J:= f ideal (JMatrix)^{m-n..m};
+    
+    J.cache#jetsInfo= new CacheTable from {
+	jetsBase=> I,
+	Projective=> o.Projective
+	};
+    
+    return J;
     )
 
 --how to store ideal information we caculate here?
@@ -241,9 +250,15 @@ jets(ZZ,RingMap):= o -> (n,phi) -> (
 	);
 
     psi:= map(JS,JR,
-	flatten transpose targets)
+	flatten transpose targets);
 --	DegreeLift=> degreeLift,
 --	DegreeMap=> degreeMap);
+    
+    psi.cache#jetsInfo= new CacheTable from {
+    	jetsBase=> phi,
+    	Projective=> o.Projective
+    	};	  
+    return psi;
    )
 
 
@@ -272,7 +287,7 @@ jetsRadical(ZZ,Ideal):= (n,I) -> (
 
 --to create a map sending elements of a jets ring to a jets ring of
 --higher order
-jetsProjection= method(Options=>opts);
+jetsProjection= method(Options=>jetsOptions);
 
 jetsProjection(ZZ,ZZ,PolynomialRing):= o -> (t,s,R) -> (
 
@@ -282,7 +297,20 @@ jetsProjection(ZZ,ZZ,PolynomialRing):= o -> (t,s,R) -> (
     (map(jets(t,R,Projective=> o.Projective),jets(s,R,Projective=> o.Projective)))
     ) 
 
-
+JJ = new ScriptedFunctor from {
+     subscript => (
+	  i -> new ScriptedFunctor from {
+	       argument => (X -> (
+	       	    	 jetsOptions >> o -> Y -> (
+		    	      f := lookup(jets,class i,class Y);
+		    	      if f === null then error "no method available"
+		    	      else (f o)(i,Y)
+			      )
+	       	    	 ) X
+	       	    )
+	       }
+	  )
+     }
 
 beginDocumentation()
 ----------------------------------------------------------------------
@@ -352,6 +380,7 @@ Node
 	(jets,ZZ,PolynomialRing)
 	(jets,ZZ,Ideal)
 	(jets,ZZ,RingMap)
+	JJ
 	
 Node
     Key
@@ -644,5 +673,23 @@ Node
 	    use jets(2,R)
 	    p= (x2 + 2*x1*y1 + x0*y2^2)
 	    f p
+
+Node
+    Key
+    	JJ
+    Headline
+    	Scripted functor assosiated with @TO jets@
+    Usage
+    	JJ_n X
+    Inputs
+    	n:ZZ
+    Description
+    	Text
+	    Shorthand for @TO jets@
+	Example
+	    R= QQ[x,y]
+	    I= ideal(y^2-x^3)
+	    JJ_2 R
+	    JJ_2 I
 ///
 end
