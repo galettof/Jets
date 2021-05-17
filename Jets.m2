@@ -206,9 +206,9 @@ jets(ZZ,Ideal):= o -> (n,I) -> (
    
     --retrieve ideal of appropriate order
     JMatrix:= I.cache#typeName#jetsMatrix; 
-    f:= map(jets(n,R),jets(m,R));
+    f:= map(jets(n,R,Projective=> o.Projective),jets(m,R, Projective=> o.Projective));
     J:= f ideal (JMatrix)^{m-n..m};
-    
+
     J.cache#jetsInfo= new CacheTable from {
 	jetsBase=> I,
 	Projective=> o.Projective
@@ -217,7 +217,44 @@ jets(ZZ,Ideal):= o -> (n,I) -> (
     return J;
     )
 
---how to store ideal information we caculate here?
+jets(ZZ,QuotientRing):= o -> (n,R) -> (
+    splitQuotient:= presentation R;
+    ambientRing:= ring splitQuotient;
+    base:= null; --jets ring to be used in quotient
+    modI:= null; --jets ideal to be used in quotient
+    Q:= null; --variable to store quotient ring
+    
+    typeName:= if o.Projective then (projet) else (jet);
+    if not R#? typeName then (
+	base= jets(0, ambientRing, Projective=> o.Projective);
+	modI= jets(0, ideal(splitQuotient), Projective=> o.Projective);
+	R#typeName= new CacheTable from {
+	    (symbol jetsRing)=> new CacheTable from {
+		0 => base/modI
+		},
+	    };
+	);
+    
+    --form the jets of a quotient ring by taking the quotients of a jets
+    --ring and a jets ideal.  Each order of the quotient is stored in a
+    --cache table with the integer value of the order as the key    
+    if R#typeName#jetsRing#? n then (
+	Q= R#typeName#jetsRing#n;
+	) else (
+	base= jets(n, ambientRing, Projective=> o.Projective);
+	modI= jets(n, ideal(splitQuotient), Projective=> o.Projective);
+	Q= base/modI;
+	R#typeName#jetsRing#n= Q;
+	Q#jetsInfo= new CacheTable from {
+    	    jetsBase=> R,
+       	    Projective=> o.Projective
+	    }
+	);
+    
+    return Q;
+    )
+
+
 jets(ZZ,RingMap):= o -> (n,phi) -> (
     I:= ideal(phi.matrix);
     typeName:= if o.Projective then (projet) else (jet);
@@ -258,6 +295,7 @@ jets(ZZ,RingMap):= o -> (n,phi) -> (
     	jetsBase=> phi,
     	Projective=> o.Projective
     	};	  
+    
     return psi;
    )
 
@@ -354,6 +392,7 @@ TEST ///
     assert(isHomogeneous jets(3,phi))
     assert(isHomogeneous jets(3,phi,Projective=>true))
 ///
+
 ----------------------------------------------------------------------
 -- Documentation
 ----------------------------------------------------------------------
@@ -379,6 +418,7 @@ Node
     Subnodes	
 	(jets,ZZ,PolynomialRing)
 	(jets,ZZ,Ideal)
+	(jets,ZZ,QuotientRing)
 	(jets,ZZ,RingMap)
 	JJ
 	
@@ -452,6 +492,31 @@ Node
     	    J= jets(3,I);
     	    I.cache#jet#jetsMatrix
 	    netList J_*
+
+Node
+    Key
+	(jets,ZZ,QuotientRing)
+    Headline
+    	the jets of a @TO QuotientRing@
+    Usage
+    	jets (n,Q)
+    Inputs
+	n:ZZ
+	Q:QuotientRing
+    Outputs
+        :QuotientRing
+    Description
+    	Text
+    	    forms the jets of a @TO QuotientRing@ by forming the quotient of
+	    @TO (jets,ZZ,PolynomialRing)@ of the ambient ring of @TT "Q"@ with 
+	    @TO (jets,ZZ,Ideal)@ of the ideal defining @TT "Q"@
+    	Example	    
+	    R= QQ[x,y];
+	    I= ideal(y^2-x^3);
+    	    Q= R/I;
+	    JQ= jets(2,Q);
+    	    ambient JQ
+	    ideal JQ
 
 Node
     Key
