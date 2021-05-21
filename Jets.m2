@@ -36,10 +36,10 @@ newPackage(
      DebuggingMode => true
      )
 
--- all user facing symbols, methods, and types must be exported
+
 importFrom(MinimalPrimes, {"radical"});
 
-
+-- all user facing symbols, methods, and types must be exported
 export {
     "JJ",
     "jets",
@@ -178,7 +178,7 @@ jets(ZZ,Ideal):= o -> (n,I) -> (
     
     --calculate higher order entries if needed
     if n>m then (
-        S= jets(n,R, Projective=> o.Projective);
+	S= jets(n,R, Projective=> o.Projective);
     	(Tdegrees, degreeMap):= jetsDegrees (R, Projective=> o.Projective);
 	T:= S[t, Degrees=> Tdegrees, Join=> false]/(ideal(t^(n+1)));
 
@@ -195,7 +195,20 @@ jets(ZZ,Ideal):= o -> (n,I) -> (
 	    );
 	
     	phi:= map(T,R,Tpolys,DegreeMap=> degreeMap);
-	(d,c):= coefficients(phi gens I);
+
+	--a list of generators for I is obtained to avoid dropping/repeating
+	geners:= for i from 0 to (numgens I)-1 list I_i;
+    	--condition determining if all generators of the ideal are constants
+	constCond:= all(geners,isConstant);
+    	--add dummy generator to avoid loss of zeros
+	gensI:= if constCond then matrix{geners|{R_0}} else matrix{geners};
+    	(d,c):= coefficients(phi gensI);
+    	--remove dummy generators if necessary
+	if constCond then (
+		L:= entries c;
+		c= matrix (for l in L list drop(l,-1));
+		);
+
 	resultMatrix:= lift(c,S);
 
 	--update value in ideal cache
@@ -206,8 +219,9 @@ jets(ZZ,Ideal):= o -> (n,I) -> (
    
     --retrieve ideal of appropriate order
     JMatrix:= I.cache#typeName#jetsMatrix; 
+    if zero JMatrix then return ideal(0_(jets(n,R)));
     f:= map(jets(n,R,Projective=> o.Projective),jets(m,R, Projective=> o.Projective));
-    J:= f ideal (JMatrix)^{m-n..m};
+    J:= f ideal (JMatrix^{m-n..m});
 
     J.cache#jetsInfo= new CacheTable from {
 	jetsBase=> I,
@@ -220,6 +234,7 @@ jets(ZZ,Ideal):= o -> (n,I) -> (
 jets(ZZ,QuotientRing):= o -> (n,R) -> (
     splitQuotient:= presentation R;
     ambientRing:= ring splitQuotient;
+--    ambientRing:= ambientPoly R;
     base:= null; --jets ring to be used in quotient
     modI:= null; --jets ideal to be used in quotient
     Q:= null; --variable to store quotient ring
