@@ -36,10 +36,10 @@ newPackage(
      DebuggingMode => true
      )
 
--- all user facing symbols, methods, and types must be exported
+
 importFrom(MinimalPrimes, {"radical"});
 
-
+-- all user facing symbols, methods, and types must be exported
 export {
     "JJ",
     "jets",
