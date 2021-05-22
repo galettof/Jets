@@ -178,7 +178,7 @@ jets(ZZ,Ideal):= o -> (n,I) -> (
     
     --calculate higher order entries if needed
     if n>m then (
-        S= jets(n,R, Projective=> o.Projective);
+        S= jets(n,ambient R, Projective=> o.Projective);
     	(Tdegrees, degreeMap):= jetsDegrees (R, Projective=> o.Projective);
 	T:= S[t, Degrees=> Tdegrees, Join=> false]/(ideal(t^(n+1)));
 
@@ -207,7 +207,7 @@ jets(ZZ,Ideal):= o -> (n,I) -> (
     --retrieve ideal of appropriate order
     JMatrix:= I.cache#typeName#jetsMatrix; 
     f:= map(jets(n,R,Projective=> o.Projective),jets(m,R, Projective=> o.Projective));
-    J:= f ideal (JMatrix)^{m-n..m};
+    J:= f promote(ideal (JMatrix)^{m-n..m},jets(n,R));
 
     J.cache#jetsInfo= new CacheTable from {
 	jetsBase=> I,
