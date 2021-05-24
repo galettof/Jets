@@ -178,7 +178,9 @@ jets(ZZ,Ideal):= o -> (n,I) -> (
     
     --calculate higher order entries if needed
     if n>m then (
-        S= jets(n,ambient R, Projective=> o.Projective);
+        --ambient ring is used to sidestep loss of jetsMatrix entries when 
+	--calculating the jets of an ideal of a quotient ring
+	S= jets(n,ambient R, Projective=> o.Projective);
     	(Tdegrees, degreeMap):= jetsDegrees (R, Projective=> o.Projective);
 	T:= S[t, Degrees=> Tdegrees, Join=> false]/(ideal(t^(n+1)));
 
@@ -207,6 +209,7 @@ jets(ZZ,Ideal):= o -> (n,I) -> (
     --retrieve ideal of appropriate order
     JMatrix:= I.cache#typeName#jetsMatrix; 
     f:= map(jets(n,R,Projective=> o.Projective),jets(m,R, Projective=> o.Projective));
+    --promote to push back to the quotient
     J:= f promote(ideal (JMatrix)^{m-n..m},jets(n,R));
 
     J.cache#jetsInfo= new CacheTable from {
