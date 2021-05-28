@@ -32,12 +32,14 @@ newPackage(
 	     }
 	   },
      Headline => "compute jet functors",
-     PackageImports => {"SimpleDoc"},
+     PackageImports => {"SimpleDoc","EdgeIdeals"},
+     PackageExports => {"EdgeIdeals"},
      DebuggingMode => true
      )
 
 
 importFrom(MinimalPrimes, {"radical"});
+--exportFrom(EdgeIdeals, {"Graph", "HyperGraph"})
 
 -- all user facing symbols, methods, and types must be exported
 export {
@@ -322,6 +324,21 @@ jets(ZZ,RingMap):= o -> (n,phi) -> (
     return psi;
    )
 
+jets(ZZ,Graph):= o -> (n,G) -> (
+    --get the list of edges of the jets of the (hyper)graph
+    --ring is flattened because graphs don't play well with towers of rings
+    E := (flattenRing(jetsRadical(n,edgeIdeal G),Result=>1)) / support;
+    --create graph
+    graph E
+    )
+
+jets(ZZ,HyperGraph):= o -> (n,G) -> (
+    --get the list of edges of the jets of the (hyper)graph
+    --ring is flattened because graphs don't play well with towers of rings
+    E := (flattenRing(jetsRadical(n,edgeIdeal G),Result=>1)) / support;
+    --create hypergraph
+    hyperGraph E
+    )
 
 ---Secondary Methods--------------------------------------------------
 
@@ -416,6 +433,23 @@ TEST ///
     assert(isHomogeneous jets(3,phi,Projective=>true))
 ///
 
+--for ideals with constant generators
+TEST ///
+    R=QQ[x]
+    I0= ideal(2_R)
+    Ftest0=jets(2,I0)
+    assert(Ftest0==jets(2,R))
+    I1= ideal(2_R,x)
+    Ftest1=jets(2,I1)
+    assert(Ftest1== jets(2,R))
+    S=ZZ[x]
+    J0= ideal(2_S)
+    Ztest0= jets(2,J0)
+    assert(Ztest0!= jets(2,S))
+    J1= ideal(2_S,x) 
+    Ztest1=jets(2,J1)
+    assert(Ztest1!=jets(2,S))
+///
 ----------------------------------------------------------------------
 -- Documentation
 ----------------------------------------------------------------------
@@ -443,6 +477,8 @@ Node
 	(jets,ZZ,Ideal)
 	(jets,ZZ,QuotientRing)
 	(jets,ZZ,RingMap)
+	(jets,ZZ,Graph)
+	(jets,ZZ,HyperGraph)
 	JJ
 	
 Node
@@ -567,6 +603,47 @@ Node
 	    Jf= jets(2,f);
 	    Jf y1
 	    f.cache#jet#jetsMatrix
+
+Node
+    Key
+	(jets,ZZ,Graph)
+    Headline
+    	the jets of a graph
+    Usage
+    	jets (n,G)
+    Inputs
+	n:ZZ
+	G:Graph
+	    undirected, finite, and simple
+    Outputs
+        :Graph
+	 the graph of jets of @TT "G"@
+    Description
+    	Text
+	    This function is provided by the package
+	    @TO Jets@.
+    	Example	    
+    	    needsPackage "EdgeIdeals"
+	    R= QQ[x,y,z]
+	    H= graph(R,{{x,y},{y,z}})
+	    jets(2,H)
+
+Node
+    Key
+    	(jets,ZZ,HyperGraph)
+    Headline
+    	the jets of a hypergraph
+    Usage
+    	jets (n,H)
+    Inputs
+    	n:ZZ
+	H:HyperGraph
+    Outputs
+    	:HyperGraph
+	 the graph of jets of @TT "H"@
+    Description
+    	Text
+	    This function is porived by the package @TO Jets@.
 
 Node
     Key
