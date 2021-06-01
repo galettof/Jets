@@ -367,7 +367,8 @@ jetsRadical(ZZ,Ideal):= (n,I) -> (
 --higher order
 jetsProjection= method(Options=>jetsOptions);
 
-jetsProjection(ZZ,ZZ,PolynomialRing):= o -> (t,s,R) -> (
+jetsProjection(ZZ,ZZ,PolynomialRing):=
+jetsProjection(ZZ,ZZ,QuotientRing):= o -> (t,s,R) -> (
 
     if t < s then error("first argument must be less than or equal to the second");    
     if t<0 or s<0 then error("jets orders must be non-negative integers");
