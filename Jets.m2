@@ -817,10 +817,12 @@ Node
 Node
     Key
     	(jetsProjection,ZZ,ZZ,PolynomialRing)
+	(jetsProjection,ZZ,ZZ,QuotientRing)
     Headline
     	computes projection map
     Usage
     	jets(t,s,R)
+	jets(t,s,Q)
     Inputs
     	t:ZZ
 	s:ZZ
