@@ -459,7 +459,7 @@ Node
     Key
     	Jets
     Headline
-    	Method for applying jets functor to various objects	
+    	method for applying jets functor to various objects	
     Subnodes
     	jets
 	jetsProjection
@@ -471,7 +471,7 @@ Node
     Key
     	jets
     Headline
-    	Compute the jets of an object
+    	compute the jets of an object
     Subnodes	
 	(jets,ZZ,PolynomialRing)
 	(jets,ZZ,Ideal)
@@ -556,7 +556,7 @@ Node
     Key
 	(jets,ZZ,QuotientRing)
     Headline
-    	the jets of a @TO QuotientRing@
+    	the jets of an affine algebra
     Usage
     	jets (n,Q)
     Inputs
@@ -843,7 +843,7 @@ Node
     Key
     	JJ
     Headline
-    	Scripted functor assosiated with @TO jets@
+    	scripted functor associated with jets
     Usage
     	JJ_n X
     Inputs
