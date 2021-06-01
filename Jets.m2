@@ -827,6 +827,7 @@ Node
     	t:ZZ
 	s:ZZ
 	R:PolynomialRing
+	    or a quotient of
     Outputs
     	:RingMap
 	 between jets orders
