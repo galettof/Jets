@@ -1,4 +1,10 @@
 Fred:
 
 1) add introductory paragraph to the documentation
-2) 
+2) cite Goward and Smith in jetsRadical doc
+3) cite Vojta's notes in jets(ZZ,PolynomialRing) to show Projective=>true
+4) is the cache for jet ideals documented in a separate page? if so, we can remove it from jets(ZZ,Ideal)
+5) cite Vojta's notes in jets(ZZ,Ideal) to show Projective=>true
+6) add caveat for quotient rings that GBs are computed
+7) add example of jets applied to map between quotients
+8) cite jets of graph paper in jets(ZZ,Graph)
