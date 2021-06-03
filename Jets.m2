@@ -461,7 +461,14 @@ Node
     Key
     	Jets
     Headline
-    	method for applying jets functor to various objects	
+    	method for applying jets functor to various objects
+    Description
+    	This package enables computations with jet functors.
+	It introduces the @TO jets@ method to compute jets of
+	polynomial rings, ideals, quotients, and ring homomorphisms.
+	
+        Construction of jets follows an algebraic procedure
+	discussed in several sources including, for example,
     Subnodes
     	jets
 	jetsProjection
