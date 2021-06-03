@@ -562,11 +562,21 @@ Node
     	    degrees (flattenRing JR)_0	    
     	Text
 	    When the @TO [jets,Projective]@ option is set to true, the degree 
-	    of each jets variable matches the jets order.
+	    of each jets variable matches the jets order, in accordance with
+	    Proposition 6.6 (c) of @arXiv("math/0407113","P. Vojta,
+	    	Jets via Hasse-Schmidt Derivations")@.
     	Example
 	    R=QQ[x,y,z,Degrees=>{2,1,3}]
 	    JR= jets(2,R,Projective=>true)
 	    degrees (flattenRing JR)_0
+    	Text
+	    The convention for labeling variables in the jets of polynomial ring
+	    is to append the order of the jets to name of the variables in the
+	    base ring. Existing subscripts are preserved.
+    	Example
+	    A=QQ[a_1..a_3]
+	    JA= jets(1,A)
+	    describe JA
 	    	  
 Node
     Key

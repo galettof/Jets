@@ -1,6 +1,5 @@
 Fred:
 
-3) cite Vojta's notes in jets(ZZ,PolynomialRing) to show Projective=>true
 4) is the cache for jet ideals documented in a separate page? if so, we can remove it from jets(ZZ,Ideal)
 5) cite Vojta's notes in jets(ZZ,Ideal) to show Projective=>true
 6) add caveat for quotient rings that GBs are computed
