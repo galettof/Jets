@@ -37,13 +37,10 @@ newPackage(
      DebuggingMode => true
      )
 
-<<<<<<< HEAD
+
 
 importFrom(MinimalPrimes, {"radical"});
 --exportFrom(EdgeIdeals, {"Graph", "HyperGraph"})
-=======
-importFrom("MinimalPrimes", {"radical"});
->>>>>>> 6ea3622... huh
 
 -- all user facing symbols, methods, and types must be exported
 export {
