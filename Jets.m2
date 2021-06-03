@@ -637,7 +637,9 @@ Node
 	    JQ= jets(2,Q);
     	    ambient JQ
 	    ideal JQ
-
+    Caveat
+    	Forming quotients triggers a Groebner basis computation, which may be time consuming.
+	
 Node
     Key
 	(jets,ZZ,RingMap)
