@@ -31,7 +31,7 @@ newPackage(
 	     Email=> "nickiammarino@gmail.com"
 	     }
 	   },
-     Headline => "compute jet functors",
+     Headline => "compute jets of various algebraic, geometric and combinatorial objects",
      PackageImports => {"SimpleDoc","EdgeIdeals"},
      PackageExports => {"EdgeIdeals"},
      DebuggingMode => true
@@ -461,14 +461,35 @@ Node
     Key
     	Jets
     Headline
-    	method for applying jets functor to various objects
+    	compute jets of various algebraic, geometric and combinatorial objects
     Description
-    	This package enables computations with jet functors.
-	It introduces the @TO jets@ method to compute jets of
-	polynomial rings, ideals, quotients, and ring homomorphisms.
-	
-        Construction of jets follows an algebraic procedure
-	discussed in several sources including, for example,
+    	Text
+	    This package enables computations with jet functors.
+	    It introduces the @TO jets@ method to compute jets of
+	    polynomial rings, ideals, quotients, ring homomorphisms,
+	    and varieties.
+	    
+	    The construction of jets follows an algebraic procedure
+	    discussed in several sources, including the first three
+	    references below.
+	    
+	    Additional features include an option for jets with
+	    "projective" gradings, an alternative algorithm to compute
+	    the radical of jets of monomial ideals, and a function
+	    to construct jets of graphs.
+    References
+    	@arXiv("math/0612862","L. Ein and M. Mustaţă.
+    		Jet schemes and singularities.")@
+		
+    	@arXiv("2104.08933","F. Galetto, E. Helmick, and M. Walsh.
+    		Jet graphs.")@
+		
+    	@HREF("https://doi.org/10.1080/00927870500454927",
+	    "R.A. Goward and K.E. Smith.
+	    The jet scheme of a monomial scheme.")@
+
+    	@arXiv("math/0407113","P. Vojta.
+	    	Jets via Hasse-Schmidt Derivations.")@
     Subnodes
     	jets
 	jetsProjection

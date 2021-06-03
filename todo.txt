@@ -1,6 +1,5 @@
 Fred:
 
-1) add introductory paragraph to the documentation
 2) cite Goward and Smith in jetsRadical doc
 3) cite Vojta's notes in jets(ZZ,PolynomialRing) to show Projective=>true
 4) is the cache for jet ideals documented in a separate page? if so, we can remove it from jets(ZZ,Ideal)
