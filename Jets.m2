@@ -698,21 +698,29 @@ Node
 	    undirected, finite, and simple graph or hypergraph
     Outputs
         :Graph
-	 the graph of jets of @TT "G"@
+	 the (hyper)graph of @TT "n"@-jets of @TT "G"@
     Description
     	Text
 	    This function is provided by the package
-	    @TO Jets@.  Extends from the @TO EdgeIdeals@ package.
+	    @TO Jets@.
+	    
+	    Jets of graphs are defined in § 2 of
+	    @arXiv("2104.08933","F. Galetto, E. Helmick, and M. Walsh,
+    		Jet graphs")@.
+	    The input is of type @TO "EdgeIdeals::Graph"@ as defined by
+	    the @TO EdgeIdeals@ package, which is automatically exported
+	    when loading @TO Jets@.
     	Example	    
 	    R= QQ[x,y,z]
 	    G= graph(R,{{x,y},{y,z}})
-	    jets(2,G)
+	    JG= jets(2,G)
+	    vertexCovers JG
 	Text
-	    We can also calculate the jets of a hypergraph
+	    We can also calculate the jets of a  @TO "EdgeIdeals::HyperGraph"@.
 	Example
-	    R= QQ[x,y,z,w]
-	    H= hyperGraph(R,{{x,y,z},{x,w,z},{w,x,y}})
-    	    jets(2,H)
+	    R= QQ[u,v,w,x,y,z]
+	    H= hyperGraph(R,{{u},{v,w},{x,y,z}})
+    	    jets(1,H)
 
 Node
     Key
