@@ -730,9 +730,9 @@ Node
     Description
     	Text
 	    @TO CacheTable@ for storing information on jets constructed
-	    from a base object.  For @TO PolynomialRing@, stored as @TT "x.*"@  For 
-	    @TO RingMap@ and @TO Ideal@ stored as @TT "x.cache.*"@  Also used
-	    to store basic information in @TO (jets,ZZ,PolynomialRing)@.
+	    from a base object @TT "x"@.
+	    For @TO PolynomialRing@ and @TO QuotientRing@, stored as @TT "x.*"@.
+	    For @TO RingMap@ and @TO Ideal@ stored as @TT "x.cache.*"@.
     SeeAlso
 	projet
 	jetsRing
@@ -748,9 +748,10 @@ Node
     	hashtable key
     Description
     	Text
-	    @TO CacheTable@ for storing information on the projective 
-	    jets of the base object.  For @TO PolynomialRing@, stored as @TT "x.*"@.  
-	    For @TO RingMap@ and @TO Ideal@ stored as @TT "x.cache.*"@
+	    @TO CacheTable@ for storing information on the projective jets
+	    of the base object @TT "x"@.
+	    For @TO PolynomialRing@ and @TO QuotientRing@, stored as @TT "x.*"@.
+	    For @TO RingMap@ and @TO Ideal@ stored as @TT "x.cache.*"@.
     SeeAlso
     	jet
 	jetsRing
