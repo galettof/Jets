@@ -577,6 +577,15 @@ Node
 	    A=QQ[a_1..a_3]
 	    JA= jets(1,A)
 	    describe JA
+    	Text
+	    Note that the coefficient ring of the polynomial ring does not need
+	    to be a field. The jets of the input polynomial ring will be a
+	    polynomial ring with the same coefficient ring as the input.
+    	Example
+	    Zi=ZZ[i]/ideal(i^2+1)
+	    B=Zi[b_1..b_3]
+	    JB= jets(1,B)
+	    describe JB
 	    	  
 Node
     Key

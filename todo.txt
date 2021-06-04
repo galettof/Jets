@@ -7,3 +7,5 @@ Fred:
 Also did:
 
 * used describe for jets of quotient
+* used matrix for jets of ring map
+* added example when coefficient ring is not a field
