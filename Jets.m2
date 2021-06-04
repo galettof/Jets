@@ -936,9 +936,9 @@ Node
     Description
     	Text
 	    This function is provided by the package @TO Jets@.  Generates an 
-	    inclusion map from @TO (jets,ZZ,PolynomialRing)@ of order @TT "s"@ into
-	    @TO (jets,ZZ,PolynomialRing)@ of order @TT "t"@.  Throws an error 
-	    if @TT "t<s"@.
+	    inclusion map from the order @TT "s"@ into the order @TT "t"@ jets
+	    of a (quotient of a) polynomial ring.
+	    Throws an error if @TT "t<s"@.
 	    
     	Example
 	    R=QQ[x,y]

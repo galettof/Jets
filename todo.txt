@@ -10,3 +10,4 @@ Also did:
 * added example when coefficient ring is not a field
 * tweaked the jets of graphs page a bit
 * tweaked docs for jet and projet
+* tweaked doc for jetsProjection
