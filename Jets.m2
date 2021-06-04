@@ -651,11 +651,9 @@ Node
     Inputs
 	n:ZZ
 	f:RingMap
-	 a map from a ring @TT "R"@ to a ring @TT "S"@
     Outputs
         :RingMap
-	 from the jets of order @TT "n"@ of ring @TT "R"@ to the jets of order 
-	 @TT "n"@ of a ring @TT "S"@
+	    obtained by applying the @TT "n"@-th jets functor to @TT "f"@
     Description
     	Text
 	    This function is provided by the package
@@ -665,9 +663,17 @@ Node
 	    S= QQ[t]
 	    f= map(S,R,{t,t^2,t^3})
 	    Jf= jets(2,f);
-	    target Jf
-	    source Jf
 	    matrix Jf
+    	Text
+	    This function can also be applied when the source and/or the target
+	    of the ring homomorphism are quotients of a polynomial ring
+    	Example
+	    I= ideal(y-x^2,z-x^3)
+	    Q= R/I
+	    g= map(S,Q,{t,t^2,t^3})
+	    isWellDefined g
+	    Jg= jets(2,g);
+	    isWellDefined Jg
 
 Node
     Key
