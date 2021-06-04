@@ -665,8 +665,9 @@ Node
 	    S= QQ[t]
 	    f= map(S,R,{t,t^2,t^3})
 	    Jf= jets(2,f);
-	    Jf y1
-	    f.cache#jet#jetsMatrix
+	    target Jf
+	    source Jf
+	    matrix Jf
 
 Node
     Key

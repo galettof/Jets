@@ -1,6 +1,7 @@
 Fred:
 
 4) is the cache for jet ideals documented in a separate page? if so, we can remove it from jets(ZZ,Ideal)
+   show cache for jets of rings, ideals, maps
 7) add example of jets applied to map between quotients
 8) cite jets of graph paper in jets(ZZ,Graph)
 
