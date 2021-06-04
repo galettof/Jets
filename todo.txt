@@ -1,6 +1,5 @@
 Fred:
 
 4) is the cache for jet ideals documented in a separate page? if so, we can remove it from jets(ZZ,Ideal)
-5) cite Vojta's notes in jets(ZZ,Ideal) to show Projective=>true
 7) add example of jets applied to map between quotients
 8) cite jets of graph paper in jets(ZZ,Graph)

@@ -602,13 +602,15 @@ Node
 	    netList J_*
 	Text
 	    When the @TO [jets,Projective]@ option is set to true, the degree
-	    of each jets variable matches its order (cite notes of Vojta).  
+	    of each jets variable matches its order, in accordance with
+	    Proposition 6.6 (c) of @arXiv("math/0407113","P. Vojta,
+	    	Jets via Hasse-Schmidt Derivations")@.
 	    As a result, the jets of any ideal will be homogeneous regardless
 	    of the homogeneity of the base ideal, or that of its affine jets.
 	Example
 	    R= QQ[x,y,z]
 	    I= ideal (y-x^2, z-x^3)
-	    JI= jets(2,I);
+	    JI= jets(2,I)
 	    isHomogeneous JI
 	    JIproj= jets(2,I,Projective=>true)
 	    isHomogeneous JIproj
