@@ -473,10 +473,10 @@ Node
 	    discussed in several sources, including the first three
 	    references below.
 	    
-	    Additional features include an option for jets with
-	    "projective" gradings, an alternative algorithm to compute
-	    the radical of jets of monomial ideals, and a function
-	    to construct jets of graphs.
+	    Additional features include an alternative algorithm to compute
+	    the radical of jets of monomial ideals, a function
+	    to construct jets of graphs, and an option for jets with
+	    "projective" gradings.
     References
     	@arXiv("math/0612862","L. Ein and M. Mustaţă,
     		Jet schemes and singularities.")@
