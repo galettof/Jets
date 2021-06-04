@@ -637,8 +637,7 @@ Node
 	    I= ideal(y^2-x^3);
     	    Q= R/I;
 	    JQ= jets(2,Q);
-    	    ambient JQ
-	    ideal JQ
+	    describe JQ
     Caveat
     	Forming quotients triggers a Groebner basis computation, which may be time consuming.
 	
