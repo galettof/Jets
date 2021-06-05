@@ -554,7 +554,8 @@ Node
 	    This function is provided by the package @TO Jets@.  Rings are 
 	    constructed incrementally as towers.  The function returns the 
 	    ring with variables in the jets order requested, and coeffients 
-	    in all lower orders.  Grading follows that of the base ring.  
+	    in all lower orders.  The grading or multigrading of the jets ring 
+	    follows from that of the base ring.
     	Example	    
 	    R= QQ[x,y,z,Degrees=>{2,1,3}]
 	    JR= jets(2,R)
@@ -972,7 +973,7 @@ Node
     	some examples
     Description
     	Text
-	    @TO (jetsRadical,ZZ,Ideal)@ can significanly speed up the calculation
+	    @TO (jetsRadical,ZZ,Ideal)@ can potentially speed up the calculation
 	    of radical ideals of jets ideals
 	Example
 	    R=QQ[x,y,z]
