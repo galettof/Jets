@@ -527,6 +527,7 @@ Node
 	jetsProjection
 	jetsRadical
 	[jets,Projective]
+	principalComponent
 	"Storing Computations"
 	"Examples of functionality"
 
