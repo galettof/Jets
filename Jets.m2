@@ -54,7 +54,8 @@ export {
     "jetsMatrix",
     "jetsRadical",
     "jetsProjection",
-    "jetsInfo"
+    "jetsInfo",
+    "principalComponent"
     }
 
 jetsOptions= {
@@ -391,6 +392,25 @@ JJ = new ScriptedFunctor from {
 	       }
 	  )
      }
+ 
+--compute an ideal whose vanishing locus is the
+--principal component of the jets of an ideal
+principalComponent = method()
+principalComponent(ZZ,Ideal) := (n,I) -> (
+    -- compute jets of I
+    JI := jets(n,I);
+    -- get the jets projection
+    R := ring I;
+    p := jetsProjection(n,0,R);
+    -- identify original ambient ring with 0-jets
+    i := map(source p,R,vars source p);
+    --compute the singular locus of I
+    --map it to the zero jets via the map i
+    --then to the n jets via the map p
+    sing := p(i(ideal singularLocus I));
+    -- need to saturate because JI need not be radical
+    saturate(JI,sing)
+    )
 
 beginDocumentation()
 ----------------------------------------------------------------------

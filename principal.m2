@@ -29,6 +29,10 @@ I=ideal(x*y*(x+y-1))
 JR=jets(2,R)
 JI=jets(2,I)
 P=primaryDecomposition JI
-apply(P,dim)
 PC=principalComponent(2,I)
 apply(P,c -> c==PC)
+dim PC
+apply(P,dim)
+degree PC
+apply(P,degree)
+PC==intersect(select(P,c -> degree c==1))
