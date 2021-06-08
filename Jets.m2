@@ -982,6 +982,62 @@ Node
 
 Node
     Key
+    	principalComponent
+    	(principalComponent,ZZ,Ideal)
+    Headline
+    	computes principal component of jets
+    Usage
+    	principalComponent(s,I)
+    Inputs
+	s:ZZ
+	I:Ideal
+    Outputs
+    	:Ideal
+	 whose vanishing locus is the principal component of the @TT "s"@-jets of @TT "I"@
+    Description
+    	Text
+	    This function is provided by the package @TO Jets@.
+	    
+	    Consider an affine variety $X \subseteq \mathbb{A}^n_\Bbbk$.
+	    The principal (or dominant) component of the $s$-jets of $X$
+	    is the Zariski closure of the $s$-jets of the smooth locus of $X$.
+	    Let $X_{\mathrm{reg}}$ and $X_{\mathrm{sing}}$ denote respectively
+	    the smooth and singular locus of $X$. If $\mathcal{J}_s$ denotes
+	    the $s$-jets functor, then there is a natural embedding
+	    $$X_\mathrm{sing} \subset X \subseteq \mathbb{A}^n_\Bbbk \subset
+	    \mathcal{J}_s (\mathbb{A}^n_\Bbbk) \cong \mathbb{A}^{n(s+1)}_\Bbbk.$$
+	    Let $I$ denote the ideal of $X_\mathrm{sing}$ in this embedding,
+	    and let $J$ denote the ideal of $\mathcal{J}_s (X)$; both ideals
+	    live in the polynomial ring $\Bbbk [\mathbb{A}^{n(s+1)}_\Bbbk]$.
+	    We have an equality of sets $$\mathcal{J}_s (X_\mathrm{reg}) =
+	    \mathcal{J}_s (X) \setminus X_\mathrm{sing} = \mathbf{V} (J)
+	    \setminus \mathbf{V} (I).$$ By Theorem 10 in Chapter 4, §4 of
+	    @HREF("https://doi.org/10.1007/978-3-319-16721-3",
+		"D.A. Cox, J. Little, D. O'Shea - Ideals, Varieties, and Algorithms")@,
+	    if $\Bbbk$ is algebraically closed, then there is an equality
+	    $$\mathbf{V} (J\colon I^\infty) = \overline{\mathbf{V} (J)
+	    \setminus \mathbf{V} (I)} = \overline{\mathcal{J}_s (X_\mathrm{reg})}.$$
+	    This function returns the ideal $J\colon I^\infty$.
+	    
+	    As an example, consider the union of three non parallel lines
+	    in the affine plane. We compute the principal component of the
+	    jets of order two.
+    	Example
+	    R=QQ[x,y]
+	    I=ideal(x*y*(x+y-1))
+	    PC=principalComponent(2,I)
+    	Text
+	    Despite the name, the principal component need not be a component
+	    of the jet scheme (i.e., it need not be irreducible). In this example,
+	    the principal component has degree 3 and is the union of three components
+	    of degree 1.
+    	Example
+	    P=primaryDecomposition jets(2,I)
+	    any(P,c -> c==PC)
+	    PC==intersect(select(P,c -> degree c==1))
+
+Node
+    Key
     	JJ
     Headline
     	scripted functor associated with jets
