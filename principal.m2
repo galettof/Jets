@@ -17,12 +17,11 @@ principalComponent(ZZ,Ideal) := (n,I) -> (
 --examples
 R=QQ[x,y]
 I=ideal(y^2-x^3)
-JR=jets(2,R)
-JI=jets(2,I)
-P=primaryDecomposition JI
 PC=principalComponent(2,I)
---check
-PC==P_1
+P=primaryDecomposition jets(2,I)
+apply(P,degree)
+degree PC
+PC==first select(P,c -> degree c==6)
 --
 R=QQ[x,y]
 I=ideal(x*y*(x+y-1))

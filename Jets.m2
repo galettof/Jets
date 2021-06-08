@@ -472,6 +472,18 @@ TEST ///
     Ztest1=jets(2,J1)
     assert(Ztest1!=jets(2,S))
 ///
+
+--for principal component
+TEST ///
+    R=QQ[x,y]
+    I=ideal(y^2-x^3)
+    PC=principalComponent(2,I)
+    P=primaryDecomposition jets(2,I)
+    C=first select(P,c -> degree c==6)
+    assert(PC==C)
+///
+
+
 ----------------------------------------------------------------------
 -- Documentation
 ----------------------------------------------------------------------
