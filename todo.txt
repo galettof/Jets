@@ -11,3 +11,4 @@ Also did:
 * tweaked the jets of graphs page a bit
 * tweaked docs for jet and projet
 * tweaked doc for jetsProjection
+* added principal component method
