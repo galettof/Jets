@@ -55,7 +55,8 @@ export {
     "jetsRadical",
     "jetsProjection",
     "jetsInfo",
-    "principalComponent"
+    "principalComponent",
+    "Saturate"
     }
 
 jetsOptions= {
@@ -395,8 +396,8 @@ JJ = new ScriptedFunctor from {
  
 --compute an ideal whose vanishing locus is the
 --principal component of the jets of an ideal
-principalComponent = method()
-principalComponent(ZZ,Ideal) := (n,I) -> (
+principalComponent = method(Options=>{Saturate=>true})
+principalComponent(ZZ,Ideal) := o -> (n,I) -> (
     -- compute jets of I
     JI := jets(n,I);
     -- get the jets projection
@@ -408,8 +409,14 @@ principalComponent(ZZ,Ideal) := (n,I) -> (
     --map it to the zero jets via the map i
     --then to the n jets via the map p
     sing := p(i(ideal singularLocus I));
-    -- need to saturate because JI need not be radical
-    saturate(JI,sing)
+    --default is to saturate JI wrt sing
+    if o.Saturate then (
+    	saturate(JI,sing)
+	)
+    --if JI is radical, colon is enough
+    else (
+	JI:sing
+	)
     )
 
 beginDocumentation()
@@ -1019,6 +1026,14 @@ Node
 	    $$\mathbf{V} (J\colon I^\infty) = \overline{\mathbf{V} (J)
 	    \setminus \mathbf{V} (I)} = \overline{\mathcal{J}_s (X_\mathrm{reg})}.$$
 	    This function returns the ideal $J\colon I^\infty$.
+	    
+	    If $J$ is known to be a radical ideal, then
+	    $\mathbf{V} (J\colon I) = \overline{\mathbf{V} (J)
+	    \setminus \mathbf{V} (I)}$ by Corollary 11 in Chapter 4, §4 of
+	    @HREF("https://doi.org/10.1007/978-3-319-16721-3",
+		"D.A. Cox, J. Little, D. O'Shea - Ideals, Varieties, and Algorithms")@.
+	    In this case, the user may pass the option @TT "Saturate=>false"@
+	    to return the ideal $J\colon I$, which can speed up computations.
 	    
 	    As an example, consider the union of three non parallel lines
 	    in the affine plane. We compute the principal component of the
