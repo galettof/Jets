@@ -343,6 +343,12 @@ jets(ZZ,HyperGraph):= o -> (n,G) -> (
     hyperGraph E
     )
 
+jets(ZZ,AffineVariety):= o -> (n,V) -> (
+    R:= ring V;
+    JR:= jets(n,R,Projective=> o.Projective);
+    if o.Projective then return Proj JR else return Spec JR;
+    )
+
 ---Secondary Methods--------------------------------------------------
 
 --to reduce computation time for monomial jet ideals  (cite article of 
@@ -549,6 +555,7 @@ Node
 	(jets,ZZ,QuotientRing)
 	(jets,ZZ,RingMap)
 	(jets,ZZ,Graph)
+    	(jets,ZZ,AffineVariety)
 	JJ
 	
 Node
@@ -567,7 +574,6 @@ Node
 	    keys I.cache.jet
     Subnodes
 	jet
-
 	projet
 	jetsRing
 	jetsMaxOrder
@@ -772,6 +778,36 @@ Node
 	    R= QQ[u,v,w,x,y,z]
 	    H= hyperGraph(R,{{u},{v,w},{x,y,z}})
     	    jets(1,H)
+
+Node
+    Key
+    	(jets,ZZ,AffineVariety)
+    Headline
+    	the jets of an affine variety
+    Usage
+    	jets (n,V)
+    Inputs
+    	n:ZZ
+	V:AffineVariety
+    Outputs
+    	:Variety
+    	 an @TO AffineVariety@ or a @TO ProjectiveVariety@
+    Description
+    	Text
+	    Returns the jets of an @TO AffineVariety@ as an @TO AffineVariety@ 
+	    or a @TO ProjectiveVariety@ (see @TO [jets,Projective]@).  Note: jets
+	    of a projective variety are not supported.
+	Example
+	    R=QQ[x,y]
+	    I= ideal(y^2-x^2*(x+1))
+	    A= Spec(R/I)
+	    jets(2,A)
+	    jets(2,A,Projective=>true)
+    Caveat
+    	With @TT "Projective=>true"@ the jet variables of order zero have degree 0,
+	therefore no heft vector exist for the ambient ring of the jets.
+	As a result, certain computations will not be supported, and others may run more slowly.
+	See @TO "Macaulay2Doc::heft vectors"@ for more information.
 
 Node
     Key
