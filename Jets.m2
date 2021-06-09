@@ -627,6 +627,11 @@ Node
 	    B=Zi[b_1..b_3]
 	    JB= jets(1,B)
 	    describe JB
+    Caveat
+    	With @TT "Projective=>true"@ the jet variables of order zero have degree 0,
+	therefore no heft vector exist for the ambient ring of the jets.
+	As a result, certain computations will not be supported, and others may run more slowly.
+	See @TO "Macaulay2Doc::heft vectors"@ for more information.
 	    	  
 Node
     Key
@@ -664,6 +669,11 @@ Node
 	    isHomogeneous JI
 	    JIproj= jets(2,I,Projective=>true)
 	    isHomogeneous JIproj
+    Caveat
+    	With @TT "Projective=>true"@ the jet variables of order zero have degree 0,
+	therefore no heft vector exist for the ambient ring of the jets.
+	As a result, certain computations will not be supported, and others may run more slowly.
+	See @TO "Macaulay2Doc::heft vectors"@ for more information.
 
 Node
     Key
