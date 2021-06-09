@@ -1051,6 +1051,10 @@ Node
 	    P=primaryDecomposition jets(2,I)
 	    any(P,c -> c==PC)
 	    PC==intersect(select(P,c -> degree c==1))
+    Caveat
+    	This function requires computation of a singular locus,
+	a saturation (or quotient), and jets, with each step being
+	potentially quite time consuming.
 
 Node
     Key
