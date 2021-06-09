@@ -1055,7 +1055,21 @@ Node
     	This function requires computation of a singular locus,
 	a saturation (or quotient), and jets, with each step being
 	potentially quite time consuming.
-
+    Subnodes
+    	Saturate
+	
+Node
+    Key
+    	Saturate
+    	[principalComponent,Saturate]
+    Headline
+    	option for principal components
+    Description
+    	Text
+	    Strategy for computing principal components of jet schemes
+    SeeAlso
+    	principalComponent
+		    
 Node
     Key
     	JJ
