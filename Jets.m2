@@ -892,9 +892,22 @@ Node
     Key
     	[jets,Projective]
    	[jetsProjection,Projective]
+    Headline
+    	Option for jets
     Description
     	Text
-	    Use projective case degrees for varibales in jets objects.(cite Vojta)
+	    Set the degree of each jet variable to match its order,
+	    as in Proposition 6.6 (c) of
+	    @arXiv("math/0407113","P. Vojta, Jets via Hasse-Schmidt Derivations")@.
+	    This guarantees that the output of @TO jets@ is homogeneous.
+    Caveat
+    	With @TT "Projective=>true"@ the jet variables of order zero have degree 0,
+	therefore no heft vector exist for the ambient ring of the jets.
+	As a result, certain computations will not be supported, and others may run more slowly.
+	See @TO "Macaulay2Doc::heft vectors"@ for more information.
+    SeeAlso
+    	(jets,ZZ,PolynomialRing)
+	(jets,ZZ,Ideal)
 	    
 Node
     Key
