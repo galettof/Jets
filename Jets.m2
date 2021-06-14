@@ -795,20 +795,26 @@ Node
     	 an @TO AffineVariety@ or a @TO ProjectiveVariety@
     Description
     	Text
-	    Returns the jets of an @TO AffineVariety@ as an @TO AffineVariety@ 
-	    or a @TO ProjectiveVariety@ (see @TO [jets,Projective]@).  Note: jets
-	    of a projective variety are not supported.
+	    Returns the jets of an @TO AffineVariety@ as an @TO AffineVariety@. 
 	Example
 	    R=QQ[x,y]
 	    I= ideal(y^2-x^2*(x+1))
 	    A= Spec(R/I)
 	    jets(2,A)
+    	Text
+	    If @TO [jets,Projective]@ is set to true, then jets are computed
+	    with the grading introduced in Proposition 6.6 (c) of
+	    @arXiv("math/0407113","P. Vojta, Jets via Hasse-Schmidt Derivations")@,
+	    and the function returns a @TO ProjectiveVariety@.
+	Example
 	    jets(2,A,Projective=>true)
     Caveat
     	With @TT "Projective=>true"@ the jet variables of order zero have degree 0,
 	therefore no heft vector exist for the ambient ring of the jets.
 	As a result, certain computations will not be supported, and others may run more slowly.
 	See @TO "Macaulay2Doc::heft vectors"@ for more information.
+	
+	Note: jets of projective varieties are currently not implemented.
 
 Node
     Key
