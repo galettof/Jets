@@ -19,7 +19,7 @@ newPackage(
      "Jets",
      Version => "0.1",
      Date => "April 22, 2021",
-     AuxiliaryFiles => false,
+     AuxiliaryFiles => true,
      Authors => {
 	 {
 	     Name => "Federico Galetto",
@@ -1235,6 +1235,8 @@ Node
 	    @TO "EdgeIdeals::HyperGraph"@ from the Macaulay2 @TO "EdgeIdeals::EdgeIdeals"@ package
 	    (which is automatically loaded by the @TO Jets@ package.
 	    Consider, for example, the graph in the figure below.
+    	Code
+      	    IMG ("src" => replace("PKG", "Style", currentLayout#"package") | "graph.gif", "alt" => "a graph on 5 vertices")
 	Example
 	    R=QQ[x,y,z]
 	    I=ideal(x*y*z)
