@@ -544,6 +544,7 @@ Node
 	"Storing Computations"
 	"Examples of functionality"
 	"Example 1"
+	"Example 2"
 
 Node
     Key
