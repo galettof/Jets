@@ -1252,5 +1252,23 @@ Node
 	    chromatic number.
 	Example
 	    apply({G,J1G,J2G},chromaticNumber)
+    	Text
+	    By contrast, jets may not preserve the property of being co-chordal.
+    	Example
+	    apply({G,J1G,J2G},x -> isChordal complementGraph x)	    
+    	Text
+	    Using Fröberg's Theorem (cf. R. Fröberg, On Stanley-Reisner rings),
+	    we deduce that although
+	    the edge ideal of a graph may have a linear free resolution, the edge
+	    ideals of its jets may not have linear resolutions.
+        	
+	    Finally, we compare minimal vertex covers of the graph and of its
+	    second order jets.
+    	Example
+    	    vertexCovers G
+	    netList pack(2,vertexCovers J2G)
+    	Text
+	    With the exception of the second row, many vertex covers arise as
+	    indicated in [GHW21, Proposition 5.2, 5.3].
 ///
 end
