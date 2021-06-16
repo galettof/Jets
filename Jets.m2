@@ -1197,7 +1197,7 @@ Node
 	    elapsedTime radical J2I
 	Text
 	    For a monomial hypersurface, [GS06, Theorem 3.2] describes the minimal primes of the
-	    ideal of jets. Moreover, the main theorem in @HREF("https://arxiv.org/abs/math/0607638",
+	    ideal of jets. Moreover, the main theorem in @arXiv("math/0607638",
 	    "C. Yuen, Multiplicity of jet schemes of monomial schemes")@ counts the multiplicity of the jet scheme
 	    of a monomial hypersurface along its minimal primes (see also @HREF("https://doi.org/10.1080/00927870701512168",
 	    "C. Yuen, The multiplicity of jet schemes of a simple normal crossing divisor")@). We compute the
