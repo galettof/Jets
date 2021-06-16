@@ -1315,5 +1315,25 @@ Node
 	    JI2=jets(1,I2)
 	    P=primaryDecomposition JI2; #P
 	    P_1
+    	Text
+	    The other component is the so-called principal component of the jet
+	    scheme, i.e., the Zariski closure of the first jets of the smooth
+	    locus of $X_1$. To check this, we first establish that the first jet
+	    scheme is reduced (i.e. its ideal is radical), then use the
+	    @TO principalComponent@ method with the option
+	    @TO [principalComponent,Saturate]@ set to @TT "false"@ to speed up computations.
+    	Example
+	    radical JI2==JI2
+	    P_0 == principalComponent(1,I2,Saturate=>false)
+	    P_0
+    	Text
+	    Finally, as observed in Theorem 18 of @HREF("http://dx.doi.org/10.2140/pjm.2014.272.147",
+		"S.R. Ghorpade, B. Jonov and B.A. Sethuraman,
+		Hilbert series of certain jet schemes of determinantal varieties")@ the Hilbert
+	    series of the principal component of the first jet scheme of $X_1$ is
+	    the square of the Hilbert series of $X_1$.
+    	Example
+	    apply({P_0,I2}, X -> hilbertSeries(X,Reduce=>true))
+	    numerator (first oo) == (numerator last oo)^2
 ///
 end
