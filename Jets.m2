@@ -545,6 +545,7 @@ Node
 	"Examples of functionality"
 	"Example 1"
 	"Example 2"
+	"Example 3"
 
 Node
     Key
@@ -1270,5 +1271,49 @@ Node
     	Text
 	    With the exception of the second row, many vertex covers arise as
 	    indicated in [GHW21, Proposition 5.2, 5.3].
+
+Node
+    Key
+    	"Example 3"
+    Headline
+    	jets of determinantal varieties
+    Description
+    	Text
+	    Consider the determinantal varieties $X_r$ of
+	    $3\times 3$ matrices of rank at most $r$, which are defined by the
+	    vanishing of minors of size $r+1$.  We illustrate computationally some
+	    of the known results about jets.
+	Example
+	    R=QQ[x_(1,1)..x_(3,3)]
+	    G=genericMatrix(R,3,3)
+	Text
+	    Since $X_0$ is a single point, its first jet scheme consists of a
+	    single (smooth) point.
+    	Example
+	    I1=minors(1,G)
+	    JI1=jets(1,I1)
+	    dim JI1, isPrime JI1
+	Text
+	    The jets of $X_2$ (the variety of maximal minors) are known to be
+	    irreducible (see Theorem 3.1 in @HREF("https://doi.org/10.1016/j.jpaa.2004.06.001",
+		    "T. Košir, B.A. Sethuraman, Determinantal varieties over truncated polynomial rings")@ [KS05],
+		or Corollary 4.13 in @HREF("https://doi.org/10.1090/S0002-9947-2012-05564-4",
+		    "R. Docampo, Arcs on determinantal varieties")@ [Doc13]).
+	Example
+	    I3=minors(3,G)
+	    JI3=jets(1,I3)
+	    isPrime JI3
+    	Text
+    	    As for the case of $2\times 2$ minors, Theorem 5.1 in [KS05], Theorem 5.1 in
+	    @arXiv("math/0608632","C. Yuen, Jet schemes of determinantal varieties")@,
+	    and Corollary 4.13 in [Doc13] all count the number of components;
+	    the first two references describe
+	    the components further. As expected, the first jet scheme of $X_1$ has
+	    two components, one of them an affine space.
+    	Example
+	    I2=minors(2,G)
+	    JI2=jets(1,I2)
+	    P=primaryDecomposition JI2; #P
+	    P_1
 ///
 end
