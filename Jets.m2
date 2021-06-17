@@ -516,15 +516,14 @@ Node
 	    It introduces the @TO jets@ method to compute jets of
 	    polynomial rings, ideals, quotients, ring homomorphisms,
 	    and varieties.
-	    
 	    The construction of jets follows an algebraic procedure
 	    discussed in several sources, including the first three
 	    references below.
 	    
 	    Additional features include an alternative algorithm to compute
 	    the radical of jets of monomial ideals, a function
-	    to construct jets of graphs, and an option for jets with
-	    "projective" gradings.
+	    to construct jets of graphs, a method for principal components of jets,
+	    and an option for jets with "projective" gradings.
     References
     	@arXiv("math/0612862","L. Ein and M. Mustaţă,
     		Jet schemes and singularities.")@
