@@ -248,6 +248,7 @@ jets(ZZ,Ideal):= Ideal => o -> (n,I) -> (
     )
 
 jets(ZZ,QuotientRing):= QuotientRing => o -> (n,R) -> (
+    if n<0 then error("jets order must be a non-negative integer");
     splitQuotient:= presentation R;
     ambientRing:= ring splitQuotient;
 --    ambientRing:= ambientPoly R;
@@ -287,9 +288,9 @@ jets(ZZ,QuotientRing):= QuotientRing => o -> (n,R) -> (
 
 
 jets(ZZ,RingMap):= RingMap => o -> (n,phi) -> (
+    if n<0 then error("jets order must be a non-negative integer");
     I:= ideal(phi.matrix);
     typeName:= if o.Projective then (projet) else (jet);
-    if n<0 then error("jets order must be a non-negative integer");
     
     -- check whether jets have previously been calculated for this map
     if (not phi.cache#? typeName) then (
@@ -333,6 +334,7 @@ jets(ZZ,RingMap):= RingMap => o -> (n,phi) -> (
    )
 
 jets(ZZ,Graph):= Graph => o -> (n,G) -> (
+    if n<0 then error("jets order must be a non-negative integer");
     --get the list of edges of the jets of the (hyper)graph
     --ring is flattened because graphs don't play well with towers of rings
     E := (flattenRing(jetsRadical(n,edgeIdeal G),Result=>1)) / support;
@@ -341,6 +343,7 @@ jets(ZZ,Graph):= Graph => o -> (n,G) -> (
     )
 
 jets(ZZ,HyperGraph):= HyperGraph => o -> (n,G) -> (
+    if n<0 then error("jets order must be a non-negative integer");
     --get the list of edges of the jets of the (hyper)graph
     --ring is flattened because graphs don't play well with towers of rings
     E := (flattenRing(jetsRadical(n,edgeIdeal G),Result=>1)) / support;
@@ -349,6 +352,7 @@ jets(ZZ,HyperGraph):= HyperGraph => o -> (n,G) -> (
     )
 
 jets(ZZ,AffineVariety):= o -> (n,V) -> (
+    if n<0 then error("jets order must be a non-negative integer");
     R:= ring V;
     JR:= jets(n,R,Projective=> o.Projective);
     if o.Projective then return Proj JR else return Spec JR;
