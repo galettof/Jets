@@ -416,6 +416,7 @@ JJ = new ScriptedFunctor from {
 --principal component of the jets of an ideal
 principalComponent = method(Options=>{Saturate=>true},TypicalValue=>Ideal)
 principalComponent(ZZ,Ideal) := o -> (n,I) -> (
+    if n<0 then error("jets order must be a non-negative integer");
     -- compute jets of I
     JI := jets(n,I);
     -- get the jets projection
