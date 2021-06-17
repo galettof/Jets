@@ -313,7 +313,6 @@ jets(ZZ,RingMap):= o -> (n,phi) -> (
     	) else (
     	targets= phi.cache#typeName#jetsMatrix^{m-n..m};
 	--need to lift 'targets' to jets of order m-n
---	targets=lift(targets,ring targets,jets(m-n,(ring targets).jetsInfo.jetsBase));
 	targets=lift(targets,JS);
 	);
 
