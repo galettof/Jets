@@ -1124,7 +1124,7 @@ Node
     	principalComponent
     	(principalComponent,ZZ,Ideal)
     Headline
-    	computes principal component of jets
+    	compute principal component of jets
     Usage
     	principalComponent(s,I)
     Inputs
