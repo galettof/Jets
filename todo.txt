@@ -1,3 +1,8 @@
+Nick:
+
+* add tests for jets of quotients, graph, varieties
+* add test for jetProjections (maybe with quotients?)
+
 Fred:
 
 * review code
