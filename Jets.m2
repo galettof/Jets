@@ -17,8 +17,8 @@
 
 newPackage(
      "Jets",
-     Version => "0.1",
-     Date => "April 22, 2021",
+     Version => "0.99",
+     Date => "June 17, 2021",
      AuxiliaryFiles => true,
      Authors => {
 	 {
