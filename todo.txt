@@ -1,10 +1,9 @@
 Fred:
 
-4) is the cache for jet ideals documented in a separate page? if so, we can remove it from jets(ZZ,Ideal)
-   show cache for jets of rings, ideals, maps
-* add examples from paper to documentation
-* update page about cached information
 * review code
+* do we need to keep the options DegreeMap and DegreeLift?
+* line 203 removed reverse
+* line 215 list of generators
 
 Also did:
 

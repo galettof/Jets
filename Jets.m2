@@ -212,7 +212,8 @@ jets(ZZ,Ideal):= Ideal => o -> (n,I) -> (
     	phi:= map(T,R,Tpolys,DegreeMap=> degreeMap);
 
 	--a list of generators for I is obtained to avoid dropping/repeating
-	geners:= for i from 0 to (numgens I)-1 list I_i;
+--	geners:= for i from 0 to (numgens I)-1 list I_i;
+	geners:= I_*;
     	--condition determining if all generators of the ideal are constants
 	constCond:= all(geners,isConstant);
     	--add dummy generator to avoid loss of zeros
