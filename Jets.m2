@@ -542,7 +542,6 @@ Node
 	[jets,Projective]
 	principalComponent
 	"Storing Computations"
-	"Examples of functionality"
 	"Example 1"
 	"Example 2"
 	"Example 3"
@@ -1155,22 +1154,6 @@ Node
 	    I= ideal(y^2-x^3)
 	    JJ_2 R
 	    JJ_2 I
-
-Node
-    Key
-    	"Examples of functionality"
-    Headline
-    	some examples
-    Description
-    	Text
-	    @TO (jetsRadical,ZZ,Ideal)@ can potentially speed up the calculation
-	    of radical ideals of jets ideals
-	Example
-	    R=QQ[x,y,z]
-	    I= ideal(x*y^2, z*x, x^3)
-	    JI=jets(4,I);
-	    elapsedTime jetsRadical(4,I);
-	    elapsedTime radical JI;
 
 Node
     Key
