@@ -312,6 +312,9 @@ jets(ZZ,RingMap):= o -> (n,phi) -> (
 	phi.cache#typeName#jetsMatrix= targets;
     	) else (
     	targets= phi.cache#typeName#jetsMatrix^{m-n..m};
+	--need to lift 'targets' to jets of order m-n
+--	targets=lift(targets,ring targets,jets(m-n,(ring targets).jetsInfo.jetsBase));
+	targets=lift(targets,JS);
 	);
 
     psi:= map(JS,JR,
@@ -563,6 +566,8 @@ Node
 Node
     Key
     	"Storing Computations"
+    Headline
+    	caching scheme for jets computations
     Description
     	Text
 	    In many cases, the @TO jets@ method will store its results inside
@@ -597,7 +602,7 @@ Node
 	    elapsedTime jets(2,I)
     	Text
 	    For quotient rings, data is stored under @TT "*.jet"@.
-	    Each order of jets gives rise to different quotient
+	    Each jets order gives rise to a different quotient
 	    that is stored separately under @TT "*.jet.jetsRing"@
 	    (order zero jets are always included by default).
     	Example
@@ -605,9 +610,34 @@ Node
 	    Q.?jet
 	    jets(3,Q)
 	    Q.?jet
-	    peek Q.jet
+	    peek Q.jet.jetsRing
 	    jets(2,Q)
 	    peek Q.jet.jetsRing
+    	Text
+	    For ring homomorphisms, data is stored under @TT "*.cache.jet"@.
+	    A single matrix is stored describing the map for the
+	    highest order of jets computed thus far.
+	    Lower orders map are recovered from this matrix
+	    without additional computations.
+    	Example
+	    S= QQ[t]
+	    f= map(S,Q,{t,t^2})
+	    isWellDefined f
+	    f.cache.?jet
+	    elapsedTime jets(3,f)
+	    f.cache.?jet
+	    peek f.cache.jet
+	    elapsedTime jets(2,f)
+    	Text
+	    Projective jets data is stored separately under @TT "*.projet"@
+	    or @TT "*.cache.projet"@ to accommodate for the different grading.
+    	Example
+	    jets(2,I,Projective=>true)
+	    peek I.cache.projet
+	    peek R.projet
+    Caveat
+    	No data is cached when computing jets of affine varieties and (hyper)graphs,
+	radicals, or principal components.
     Subnodes
 	jet
 	projet
