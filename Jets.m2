@@ -40,9 +40,7 @@ newPackage(
 
 
 importFrom(MinimalPrimes, {"radical"});
---exportFrom(EdgeIdeals, {"Graph", "HyperGraph"})
 
--- all user facing symbols, methods, and types must be exported
 export {
     "JJ",
     "jets",
@@ -68,7 +66,9 @@ jetsOptions= {
 ---------------------------------------------------------------------------
 --helpers------------------------------------------------------------------
 ---------------------------------------------------------------------------
+--INPUT: n non-negative integer, R polynomial ring
 --create new-tier variables for jets ring
+--by appending the order n as a string to the variable names
 jetsVariables= (n,R) -> (
     symList:= apply(gens R, baseName);
     nString:= toString n;
@@ -84,7 +84,9 @@ jetsVariables= (n,R) -> (
     varNames= apply(varNames,value)
     )
 
---generate degree list for jets variables
+--INPUT: n non-negative integer, R polynomial ring
+--generate degree list for order n jets variables
+--this is used to create rings of projective jets
 degGenerator= (n,R) -> (
     for d in degrees R list (
 	for l in d list n
@@ -106,6 +108,8 @@ jetsDegrees= jetsOptions >> o -> R -> (
     return (Tdegrees, degreeMap);
     )
 
+--INPUT: (a quotient of) a polynomial ring
+--returns the "ambient" polynomial ring
 ambientPoly:= R -> (
     if isPolynomialRing ambient R then (
 	return ambient R;
