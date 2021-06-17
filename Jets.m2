@@ -542,12 +542,11 @@ Node
     	jets
 	jetsProjection
 	jetsRadical
-	[jets,Projective]
 	principalComponent
-	"Storing Computations"
 	"Example 1"
 	"Example 2"
 	"Example 3"
+	"Storing Computations"
 
 Node
     Key
@@ -561,6 +560,7 @@ Node
 	(jets,ZZ,RingMap)
 	(jets,ZZ,Graph)
     	(jets,ZZ,AffineVariety)
+	[jets,Projective]
 	JJ
 	
 Node
@@ -1030,14 +1030,9 @@ Node
 Node
     Key
     	jetsRadical
+    	(jetsRadical,ZZ,Ideal)
     Headline
-    	compute radical jets ideal 
-    Subnodes
-    	(jetsRadical,ZZ,Ideal)
-	
-Node
-    Key
-    	(jetsRadical,ZZ,Ideal)
+    	compute radicals of jets ideals
     Usage
     	jetsRadical(n,I)
     Inputs
@@ -1083,17 +1078,10 @@ Node
 Node
     Key
     	jetsProjection
-    Headline
-    	a map between jets rings
-    Subnodes
-    	(jetsProjection,ZZ,ZZ,PolynomialRing)
-	
-Node
-    Key
     	(jetsProjection,ZZ,ZZ,PolynomialRing)
 	(jetsProjection,ZZ,ZZ,QuotientRing)
     Headline
-    	computes projection map
+    	canonical map between jets rings
     Usage
     	jets(t,s,R)
 	jets(t,s,Q)
