@@ -394,6 +394,9 @@ jetsProjection(ZZ,ZZ,QuotientRing):= o -> (t,s,R) -> (
     (map(jets(t,R,Projective=> o.Projective),jets(s,R,Projective=> o.Projective)))
     ) 
 
+--scripted functor for jets
+--this modeled after the code for Tor
+--if new jets methods are added, this will automatically work
 JJ = new ScriptedFunctor from {
      subscript => (
 	  i -> new ScriptedFunctor from {
