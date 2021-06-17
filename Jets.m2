@@ -132,7 +132,7 @@ jets(ZZ,PolynomialRing):= PolynomialRing => o -> (n,R) -> (
     if not isCommutative R then error("jets method does not support noncommutative rings");
     
     --name to assign hashtable stored in basering depending on whether
-    --are working in the projective or affine case
+    --we are working in the projective or affine case
     typeName:= if o.Projective then (projet) else (jet);
     jetDegs:= null;--initialize degree list for jets variables
 
@@ -149,9 +149,6 @@ jets(ZZ,PolynomialRing):= PolynomialRing => o -> (n,R) -> (
     S:= R#typeName#jetsRing;
     
     --build jet ring tower incrementally up to order n
-    --this is inefficient in the affine case
-
-
     if n>m then (
 	for i from m+1 to n do(
     	    jetDegs= if o.Projective then degGenerator(i,R) else degrees R; 
