@@ -565,15 +565,49 @@ Node
     	"Storing Computations"
     Description
     	Text
-	    After the jets of an object are computed, some elements are 
-	    stored in a @TO CacheTable@ which, in turn, is stored in the 
-	    base object.  Note: no information on the jets of a graph is 
-	    stored in its base.
+	    In many cases, the @TO jets@ method will store its results inside
+	    a @TO CacheTable@ in the base object. When the method is called
+	    again with the same or a lower jets order, the result is pulled
+	    from the cache.
+	    
+	    For polynomial rings, data is stored under @TT "*.jet"@.
     	Example
 	    R= QQ[x,y]
+	    R.?jet
+	    jets(3,R)
+	    R.?jet
+	    peek R.jet
+    	Text
+	    Note also that rings of jets are built as towers from lower to
+	    higher jets orders. Therefore it is possible to store a single
+	    ring of the highest order computed thus far.
+	    
+	    For ideals, data is stored under @TT "*.cache.jet"@.
+	    A single matrix is stored containing generators for the
+	    highest order of jets computed thus far.
+	    Generators for lower orders are recovered from this matrix
+	    without additional computations.
+    	Example
 	    I= ideal (x^2 - y)
-	    jets(3,I)
-	    keys I.cache.jet
+	    I.cache.?jet
+	    elapsedTime jets(3,I)
+	    I.cache.?jet
+	    peek I.cache.jet
+	    elapsedTime jets(3,I)
+	    elapsedTime jets(2,I)
+    	Text
+	    For quotient rings, data is stored under @TT "*.jet"@.
+	    Each order of jets gives rise to different quotient
+	    that is stored separately under @TT "*.jet.jetsRing"@
+	    (order zero jets are always included by default).
+    	Example
+	    Q= R/I
+	    Q.?jet
+	    jets(3,Q)
+	    Q.?jet
+	    peek Q.jet
+	    jets(2,Q)
+	    peek Q.jet.jetsRing
     Subnodes
 	jet
 	projet
