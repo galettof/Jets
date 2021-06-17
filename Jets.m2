@@ -127,7 +127,7 @@ ambientPoly:= R -> (
 
 jets= method(Options=>jetsOptions);
 
-jets(ZZ,PolynomialRing):= o -> (n,R) -> (
+jets(ZZ,PolynomialRing):= PolynomialRing => o -> (n,R) -> (
     if n<0 then error("jets order must be a non-negative integer");
     if not isCommutative R then error("jets method does not support noncommutative rings");
     
@@ -174,7 +174,7 @@ jets(ZZ,PolynomialRing):= o -> (n,R) -> (
     return S;
     )
 
-jets(ZZ,Ideal):= o -> (n,I) -> (
+jets(ZZ,Ideal):= Ideal => o -> (n,I) -> (
     if n<0 then error("jets order must be a non-negative integer");
 
     R:= ring I;
@@ -248,7 +248,7 @@ jets(ZZ,Ideal):= o -> (n,I) -> (
     return J;
     )
 
-jets(ZZ,QuotientRing):= o -> (n,R) -> (
+jets(ZZ,QuotientRing):= QuotientRing => o -> (n,R) -> (
     splitQuotient:= presentation R;
     ambientRing:= ring splitQuotient;
 --    ambientRing:= ambientPoly R;
@@ -287,7 +287,7 @@ jets(ZZ,QuotientRing):= o -> (n,R) -> (
     )
 
 
-jets(ZZ,RingMap):= o -> (n,phi) -> (
+jets(ZZ,RingMap):= RingMap => o -> (n,phi) -> (
     I:= ideal(phi.matrix);
     typeName:= if o.Projective then (projet) else (jet);
     if n<0 then error("jets order must be a non-negative integer");
@@ -333,7 +333,7 @@ jets(ZZ,RingMap):= o -> (n,phi) -> (
     return psi;
    )
 
-jets(ZZ,Graph):= o -> (n,G) -> (
+jets(ZZ,Graph):= Graph => o -> (n,G) -> (
     --get the list of edges of the jets of the (hyper)graph
     --ring is flattened because graphs don't play well with towers of rings
     E := (flattenRing(jetsRadical(n,edgeIdeal G),Result=>1)) / support;
@@ -341,7 +341,7 @@ jets(ZZ,Graph):= o -> (n,G) -> (
     graph E
     )
 
-jets(ZZ,HyperGraph):= o -> (n,G) -> (
+jets(ZZ,HyperGraph):= HyperGraph => o -> (n,G) -> (
     --get the list of edges of the jets of the (hyper)graph
     --ring is flattened because graphs don't play well with towers of rings
     E := (flattenRing(jetsRadical(n,edgeIdeal G),Result=>1)) / support;
@@ -359,7 +359,7 @@ jets(ZZ,AffineVariety):= o -> (n,V) -> (
 
 --to reduce computation time for monomial jet ideals  (cite article of 
 --Goward and Smith)
-jetsRadical= method(); 
+jetsRadical= method(TypicalValue=>Ideal);
 
 jetsRadical(ZZ,Ideal):= (n,I) -> (
 
@@ -380,7 +380,7 @@ jetsRadical(ZZ,Ideal):= (n,I) -> (
 
 --to create a map sending elements of a jets ring to a jets ring of
 --higher order
-jetsProjection= method(Options=>jetsOptions);
+jetsProjection= method(Options=>jetsOptions,TypicalValue=>RingMap);
 
 jetsProjection(ZZ,ZZ,PolynomialRing):=
 jetsProjection(ZZ,ZZ,QuotientRing):= o -> (t,s,R) -> (
@@ -408,7 +408,7 @@ JJ = new ScriptedFunctor from {
  
 --compute an ideal whose vanishing locus is the
 --principal component of the jets of an ideal
-principalComponent = method(Options=>{Saturate=>true})
+principalComponent = method(Options=>{Saturate=>true},TypicalValue=>Ideal)
 principalComponent(ZZ,Ideal) := o -> (n,I) -> (
     -- compute jets of I
     JI := jets(n,I);
