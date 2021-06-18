@@ -3,11 +3,6 @@ Nick:
 * add tests for jets of quotients, graph, varieties
 * add test for jetProjections (maybe with quotients?)
 
-Fred:
-
-* do we need to keep the options DegreeMap and DegreeLift?
-* it seems ambientPoly is never used, can we remove it?
-
 Also did:
 
 * used describe for jets of quotient

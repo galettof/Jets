@@ -59,6 +59,8 @@ export {
 
 jetsOptions= {
     Projective=> false
+-- these are set up in case one needs to pass these options
+-- to jets of a RingMap
 --    DegreeMap=> null,
 --    DegreeLift=> null
     };
@@ -308,10 +310,11 @@ jets(ZZ,RingMap):= RingMap => o -> (n,phi) -> (
 	);
 
     psi:= map(JS,JR,
-	flatten transpose targets);
---	DegreeLift=> degreeLift,
---	DegreeMap=> degreeMap);
-    
+	flatten transpose targets
+--	,DegreeLift=> degreeLift,
+--	DegreeMap=> degreeMap
+    );
+
     psi.cache#jetsInfo= new CacheTable from {
     	jetsBase=> phi,
     	Projective=> o.Projective
