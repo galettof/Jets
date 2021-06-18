@@ -200,7 +200,6 @@ jets(ZZ,Ideal):= Ideal => o -> (n,I) -> (
 	--in the jets ring. Calculated incrementally from variables of each
 	--level of the tower.
 	tempS:= S;
---	Tpolys:= sum reverse join(
 	Tpolys:= sum join(
 	    (for i from 0 to n-1 list(
 		    promote(matrix t^(n-i),T) * vars tempS
@@ -212,7 +211,6 @@ jets(ZZ,Ideal):= Ideal => o -> (n,I) -> (
     	phi:= map(T,R,Tpolys,DegreeMap=> degreeMap);
 
 	--a list of generators for I is obtained to avoid dropping/repeating
---	geners:= for i from 0 to (numgens I)-1 list I_i;
 	geners:= I_*;
     	--condition determining if all generators of the ideal are constants
 	constCond:= all(geners,isConstant);

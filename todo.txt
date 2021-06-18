@@ -5,10 +5,7 @@ Nick:
 
 Fred:
 
-* review code
 * do we need to keep the options DegreeMap and DegreeLift?
-* line 203 removed reverse
-* line 215 list of generators
 * it seems ambientPoly is never used, can we remove it?
 
 Also did:
