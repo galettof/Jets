@@ -108,16 +108,6 @@ jetsDegrees= jetsOptions >> o -> R -> (
     return (Tdegrees, degreeMap);
     )
 
---INPUT: (a quotient of) a polynomial ring
---returns the "ambient" polynomial ring
-ambientPoly:= R -> (
-    if isPolynomialRing ambient R then (
-	return ambient R;
-	) else (
-	ambientPoly ambient R
-	) 
-    )
-
 --------------------------------------------------------------------------
 --method functions--------------------------------------------------------
 --------------------------------------------------------------------------
@@ -249,7 +239,6 @@ jets(ZZ,QuotientRing):= QuotientRing => o -> (n,R) -> (
     if n<0 then error("jets order must be a non-negative integer");
     splitQuotient:= presentation R;
     ambientRing:= ring splitQuotient;
---    ambientRing:= ambientPoly R;
     base:= null; --jets ring to be used in quotient
     modI:= null; --jets ideal to be used in quotient
     Q:= null; --variable to store quotient ring
