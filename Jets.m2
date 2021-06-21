@@ -514,6 +514,7 @@ TEST ///
     assert(ring JV===JQ)   
 ///
 
+--for graphs
 TEST ///
     R=QQ[x,y,z]
     G= graph(R,{{x,y},{y,z},{x,z}})
@@ -524,7 +525,14 @@ TEST ///
     assert((set edges JG) === (set test))
 ///
 
-
+--for projections
+TEST ///
+    R=QQ[x,y,z]
+    I= ideal(y-x^2,z-x^3)
+    JI= jets(1,I)
+    p= jetsProjection(3,1,R)
+    assert(ring p JI === jets(3,R))
+///
 ----------------------------------------------------------------------
 -- Documentation
 ----------------------------------------------------------------------
