@@ -68,7 +68,6 @@ jetsOptions= {
 ---------------------------------------------------------------------------
 --helpers------------------------------------------------------------------
 ---------------------------------------------------------------------------
---INPUT: n non-negative integer, R polynomial ring
 --create new-tier variables for jets ring
 --by appending the order n as a string to the variable names
 jetsVariables= (n,R) -> (
@@ -86,9 +85,8 @@ jetsVariables= (n,R) -> (
     varNames= apply(varNames,value)
     )
 
---INPUT: n non-negative integer, R polynomial ring
 --generate degree list for order n jets variables
---this is used to create rings of projective jets
+--this is used to create the rings of projective jets
 degGenerator= (n,R) -> (
     for d in degrees R list (
 	for l in d list n
@@ -108,7 +106,8 @@ jetsDegrees= jetsOptions >> o -> R -> (
 	degreeMap= identity;
 	);
     return (Tdegrees, degreeMap);
-    )
+    ) 
+
 
 --------------------------------------------------------------------------
 --method functions--------------------------------------------------------
@@ -123,8 +122,7 @@ jets(ZZ,PolynomialRing):= PolynomialRing => o -> (n,R) -> (
     if n<0 then error("jets order must be a non-negative integer");
     if not isCommutative R then error("jets method does not support noncommutative rings");
     
-    --name to assign hashtable stored in basering depending on whether
-    --we are working in the projective or affine case
+    --name to assign "storage" hashtable to be cached in the base ring
     typeName:= if o.Projective then (projet) else (jet);
     jetDegs:= null;--initialize degree list for jets variables
 
@@ -281,7 +279,7 @@ jets(ZZ,RingMap):= RingMap => o -> (n,phi) -> (
     I:= ideal(phi.matrix);
     typeName:= if o.Projective then (projet) else (jet);
     
-    -- check whether jets have previously been calculated for this map
+    -- check whether jets have been calculated for this map
     if (not phi.cache#? typeName) then (
 	jets(0,I, Projective=> o.Projective);
 	phi.cache#typeName= new CacheTable from {
@@ -309,6 +307,7 @@ jets(ZZ,RingMap):= RingMap => o -> (n,phi) -> (
 	targets=lift(targets,JS);
 	);
 
+--DegreeMap and DegreeLift options are set up but may not work as expected
     psi:= map(JS,JR,
 	flatten transpose targets
 --	,DegreeLift=> degreeLift,
@@ -350,8 +349,8 @@ jets(ZZ,AffineVariety):= o -> (n,V) -> (
 
 ---Secondary Methods--------------------------------------------------
 
---to reduce computation time for monomial jet ideals  (cite article of 
---Goward and Smith)
+--to potentially reduce computation time for monomial jet ideals  
+--(see documentation)
 jetsRadical= method(TypicalValue=>Ideal);
 
 jetsRadical(ZZ,Ideal):= (n,I) -> (
