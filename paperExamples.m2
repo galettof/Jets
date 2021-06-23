@@ -52,4 +52,3 @@ radical JI2==JI2
 P_0== principalComponent(1,I2,Saturate=>false)
 L= apply({P_0,I2}, X -> hilbertSeries(X,Reduce=>true))
 numerator first L == (numerator last L)^2
-
