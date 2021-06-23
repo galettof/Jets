@@ -876,6 +876,13 @@ Node
 	    R= QQ[u,v,w,x,y,z]
 	    H= hyperGraph(R,{{u},{v,w},{x,y,z}})
     	    jets(1,H)
+    Caveat
+        Rings of jets are usually constructed as towers of rings with
+    	tiers corresponding to jets of different orders. However, the
+    	tower is flattened out before constructing the edge ideal of
+    	the jets of a (hyper)graph. This is done in order to ensure
+    	compatibility with the @TO "EdgeIdeals::EdgeIdeals"@ package.
+	    
 
 Node
     Key
