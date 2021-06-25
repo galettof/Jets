@@ -25,7 +25,7 @@ jets(2,Q)
 T=QQ[t]
 f=map(T,Q,{t^2,t^3})
 isWellDefined f
---jets apply to ring mays
+--jets apply to ring maps
 j2f=jets(2,f)
 --there is a jet projection (algebraically an inclusion)
 p32Q=jetsProjection(3,2,Q)
