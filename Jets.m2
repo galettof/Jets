@@ -54,11 +54,14 @@ export {
     "jetsProjection",
     "jetsInfo",
     "principalComponent",
-    "Saturate"
+    "Saturate",
+    "JetsVars",
+    "userVars"
     }
 
 jetsOptions= {
-    Projective=> false
+    Projective=> false,
+    JetsVars=> null
 -- these are set up in case one needs to pass these options
 -- to jets of a RingMap
 --    DegreeMap=> null,
@@ -122,32 +125,66 @@ jets(ZZ,PolynomialRing):= PolynomialRing => o -> (n,R) -> (
     if n<0 then error("jets order must be a non-negative integer");
     if not isCommutative R then error("jets method does not support noncommutative rings");
     
+    if o.JetsVars =!= null then (
+	if class o.JetsVars =!= List then (
+	    error("jetVars Option must be a list or null");
+	    );
+	if (length o.JetsVars)%(numgens R) != 0 then (
+	    error("n-jets require n variables per variable of the base ring");
+	    );	
+    	);    
+
     --name to assign "storage" hashtable to be cached in the base ring
     typeName:= if o.Projective then (projet) else (jet);
     jetDegs:= null;--initialize degree list for jets variables
-
+    varList:= if o.JetsVars===null then (
+	for i from 0 to n list jetsVariables(i,R)
+	) else (
+	pack(numgens R, o.JetsVars)
+	);
+    
+    --variable to indicate whether jets have already been calculated 
+    --for this ring
+    previous:= true;
     if not R#? typeName then (
+	previous= false;
 	jetDegs= if o.Projective then degGenerator(0, R) else degrees R;
 	R#typeName= new CacheTable from {
 	    (symbol jetsMaxOrder)=> 0,
-	    (symbol jetsRing)=> coefficientRing R[jetsVariables(0,R), 
+	    (symbol jetsRing)=> coefficientRing R[varList_0, 
 		                                 Join=> false,
 					 	 Degrees=> jetDegs],
+    	    (symbol userVars)=> o.JetsVars =!= null,
+	    (symbol JetsVars)=> varList,					     
 	    }
 	);
+
     m:= R#typeName#jetsMaxOrder;
     S:= R#typeName#jetsRing;
     
+    --get the right variables in case of user defined variables
+    if R#typeName#userVars then (
+	varList= R#typeName#JetsVars;
+	if o.JetsVars =!= null and previous then (
+	    varList= varList | pack(numgens R, o.JetsVars);
+	    );
+    	);
+
+    if length varList < (n+1) then (
+    	error("not enough variables, pass additional variables with JetsVars option");
+	);
+
     --build jet ring tower incrementally up to order n
     if n>m then (
 	for i from m+1 to n do(
     	    jetDegs= if o.Projective then degGenerator(i,R) else degrees R; 
-	    S= S[jetsVariables(i,R), 
+	    S= S[varList_i, 
 		Join=> false, 
 		Degrees=> jetDegs];
             );
      	R#typeName#jetsMaxOrder= n;
 	R#typeName#jetsRing= S;
+	R#typeName#JetsVars= varList;	
 	) else if m>n then (
 	for i from 0 to m-n-1 do (
 	    S= coefficientRing S;
