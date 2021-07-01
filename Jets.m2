@@ -571,13 +571,16 @@ Node
     	@arXiv("math/0407113","P. Vojta,
 	    	Jets via Hasse-Schmidt Derivations.")@
     Subnodes
+    	:Package methods
     	jets
 	jetsProjection
 	jetsRadical
 	principalComponent
+	:Examples from the literature
 	"Example 1"
 	"Example 2"
 	"Example 3"
+	:Technical information
 	"Storing Computations"
 
 Node
