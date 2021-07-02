@@ -146,10 +146,11 @@ jets(ZZ,PolynomialRing):= PolynomialRing => o -> (n,R) -> (
 	) else (
 	pack(numgens R, o.JetsVars)
 	);
-    
     --variable to indicate whether jets have already been calculated 
     --for this ring
+    
     previous:= true;
+    
     if not R#? typeName then (
 	previous= false;
 	jetDegs= if o.Projective then degGenerator(0, R) else degrees R;
@@ -167,20 +168,27 @@ jets(ZZ,PolynomialRing):= PolynomialRing => o -> (n,R) -> (
     S:= R#typeName#jetsRing;
     
     --get the right variables in case of user defined variables
-    if R#typeName#userVars then (
+    if R#typeName#userVars and previous then (
 	
-	varList= R#typeName#JetsVars;
-		
-	if o.JetsVars =!= null and previous then (
-	    varList= varList | pack(numgens R, o.JetsVars);
---	    varList= unique apply(varList, baseName);
+	newVars:= o.JetsVars;
+	oldVars:= flatten getJetsVars(R, Projective=> o.Projective);
+	
+    	--check if lists are NOT disjoint
+	if (set oldVars - set newVars =!= set oldVars) then (
+	    --check for correct order
+	    if newVars_{0..#oldVars-1} =!= oldVars then (
+		error("passed JetsVars appear out of order");
+		);
+	    newVars= newVars_{#oldVars..#newVars-1};
 	    );
+	
+	varList= pack(numgens R, oldVars | newVars);
     	);
 
     if length varList < (n+1) then (
     	error("not enough variables, pass additional variables with JetsVars option");
 	);
-
+    
     --build jet ring tower incrementally up to order n
     if n>m then (
 	for i from m+1 to n do(
