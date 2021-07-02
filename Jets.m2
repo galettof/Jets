@@ -56,7 +56,8 @@ export {
     "principalComponent",
     "Saturate",
     "JetsVars",
-    "userVars"
+    "userVars",
+    "getJetsVars"
     }
 
 jetsOptions= {
@@ -111,7 +112,10 @@ jetsDegrees= jetsOptions >> o -> R -> (
     return (Tdegrees, degreeMap);
     ) 
 
-
+getJetsVars= jetsOptions >> o -> R -> (
+    typeName:= if o.Projective then (projet) else (jet);
+    return R#typeName#JetsVars;
+    )
 --------------------------------------------------------------------------
 --method functions--------------------------------------------------------
 --------------------------------------------------------------------------
@@ -164,9 +168,12 @@ jets(ZZ,PolynomialRing):= PolynomialRing => o -> (n,R) -> (
     
     --get the right variables in case of user defined variables
     if R#typeName#userVars then (
+	
 	varList= R#typeName#JetsVars;
+		
 	if o.JetsVars =!= null and previous then (
 	    varList= varList | pack(numgens R, o.JetsVars);
+--	    varList= unique apply(varList, baseName);
 	    );
     	);
 
