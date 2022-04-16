@@ -134,7 +134,7 @@ jets(ZZ,PolynomialRing):= PolynomialRing => o -> (n,R) -> (
 	    error("jetVars Option must be a list or null");
 	    );
 	if (length o.JetsVars)%(numgens R) != 0 then (
-	    error("n-jets require n variables per variable of the base ring");
+	    error("number of variable of base ring must divide the length of variable list");
 	    );	
     	);    
 
@@ -159,7 +159,7 @@ jets(ZZ,PolynomialRing):= PolynomialRing => o -> (n,R) -> (
 	    (symbol jetsRing)=> coefficientRing R[varList_0, 
 		                                 Join=> false,
 					 	 Degrees=> jetDegs],
-    	    (symbol userVars)=> o.JetsVars =!= null,
+    	    (symbol userVars)=> o.JetsVars,
 	    (symbol JetsVars)=> varList,					     
 	    }
 	);
@@ -168,27 +168,28 @@ jets(ZZ,PolynomialRing):= PolynomialRing => o -> (n,R) -> (
     S:= R#typeName#jetsRing;
     
     --get the right variables in case of user defined variables
-    if R#typeName#userVars and previous then (
-	
-	newVars:= o.JetsVars;
-	oldVars:= flatten getJetsVars(R, Projective=> o.Projective);
-	
-    	--check if lists are NOT disjoint
-	if (set oldVars - set newVars =!= set oldVars) then (
-	    --check for correct order
-	    if newVars_{0..#oldVars-1} =!= oldVars then (
-		error("passed JetsVars appear out of order");
+    if R#typeName#userVars =!= null and previous then (
+    	--check for new variables, varify they match the old ones
+	--and that they are valid
+    	if o.JetsVars =!= null then (
+	    if o.JetsVars_{0..length(R#typeName#userVars)-1} =!= R#typeName#userVars then (
+    	    	error("initial elements of passed user variables must match current user variables");
 		);
-	    newVars= newVars_{#oldVars..#newVars-1};
-	    );
-	
-	varList= pack(numgens R, oldVars | newVars);
-    	);
+	    
+    	    R#typeName#userVars= o.JetsVars;
 
-    if length varList < (n+1) then (
-    	error("not enough variables, pass additional variables with JetsVars option");
+	    ) else (
+
+	    varList= R#typeName#JetsVars;
+
+	    );
+
+	if length varList < (n+1) then (
+	    error("not enough variables in user defined list");
+    	    );
+	
 	);
-    
+
     --build jet ring tower incrementally up to order n
     if n>m then (
 	for i from m+1 to n do(
@@ -223,7 +224,7 @@ jets(ZZ,Ideal):= Ideal => o -> (n,I) -> (
     typeName:= if o.Projective then (projet) else (jet);
     
     if not I.cache#? typeName then (
-	S= jets(0,R, Projective=> o.Projective);
+	S= jets(0,R, Projective=> o.Projective, JetsVars=> o.JetsVars);
 	I.cache#typeName= new CacheTable from {
 	    (symbol jetsMaxOrder)=> 0,
 	    (symbol jetsMatrix)=> (map(S,R,vars S)) gens I
@@ -234,7 +235,7 @@ jets(ZZ,Ideal):= Ideal => o -> (n,I) -> (
     
     --calculate higher order entries if needed
     if n>m then (
-	S= jets(n,R, Projective=> o.Projective);
+	S= jets(n,R, Projective=> o.Projective, JetsVars=> o.JetsVars);
     	(Tdegrees, degreeMap):= jetsDegrees (R, Projective=> o.Projective);
 	T:= S[t, Degrees=> Tdegrees, Join=> false]/(ideal(t^(n+1)));
 
@@ -297,7 +298,7 @@ jets(ZZ,QuotientRing):= QuotientRing => o -> (n,R) -> (
     
     typeName:= if o.Projective then (projet) else (jet);
     if not R#? typeName then (
-	base= jets(0, ambientRing, Projective=> o.Projective);
+	base= jets(0, ambientRing, Projective=> o.Projective, JetsVars=> o.JetsVars);
 	modI= jets(0, ideal(splitQuotient), Projective=> o.Projective);
 	R#typeName= new CacheTable from {
 	    (symbol jetsRing)=> new CacheTable from {
@@ -312,7 +313,7 @@ jets(ZZ,QuotientRing):= QuotientRing => o -> (n,R) -> (
     if R#typeName#jetsRing#? n then (
 	Q= R#typeName#jetsRing#n;
 	) else (
-	base= jets(n, ambientRing, Projective=> o.Projective);
+	base= jets(n, ambientRing, Projective=> o.Projective, JetsVars=> o.JetsVars);
 	modI= jets(n, ideal(splitQuotient), Projective=> o.Projective);
 	Q= base/modI;
 	R#typeName#jetsRing#n= Q;
