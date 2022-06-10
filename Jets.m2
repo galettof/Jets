@@ -57,7 +57,7 @@ export {
     "Saturate"
     }
 
-jetsOptions= {
+jetsOptions = {
     Projective=> false
 -- these are set up in case one needs to pass these options
 -- to jets of a RingMap
@@ -70,40 +70,40 @@ jetsOptions= {
 ---------------------------------------------------------------------------
 --create new-tier variables for jets ring
 --by appending the order n as a string to the variable names
-jetsVariables= (n,R) -> (
-    symList:= apply(gens R, baseName);
-    nString:= toString n;
+jetsVariables = (n,R) -> (
+    symList := apply(gens R, baseName);
+    nString := toString n;
     varNames:=
         for s in symList list (
 	    if instance(s,IndexedVariable) then (
-	        name:= separate("_", toString s);
-	        name#0|nString|"_"|name#1
+	        name := separate("_", toString s);
+	        name#0 | nString | "_" | name#1
             ) else (
-	        toString s|nString
+	        toString s | nString
 	    )
         );
-    varNames= apply(varNames,value)
+    varNames = apply(varNames,value)
     )
 
 --generate degree list for order n jets variables
 --this is used to create the rings of projective jets
-degGenerator= (n,R) -> (
+degGenerator = (n,R) -> (
     for d in degrees R list (
 	for l in d list n
 	)
     )
 
 --generate degrees/map for truncation ring in ideal calculation
-jetsDegrees= jetsOptions >> o -> R -> (
-    Tdegrees:= null;
-    degreeMap:= null;
+jetsDegrees = jetsOptions >> o -> R -> (
+    Tdegrees := null;
+    degreeMap := null;
     
     if o.Projective then (
-	Tdegrees= -1* {degree R_0};
-	degreeMap= d -> degree 1_R;
+	Tdegrees = -1* {degree R_0};
+	degreeMap = d -> degree 1_R;
 	) else (
-	Tdegrees= {degree 1_R};
-	degreeMap= identity;
+	Tdegrees = {degree 1_R};
+	degreeMap = identity;
 	);
     return (Tdegrees, degreeMap);
     ) 
@@ -116,118 +116,118 @@ jetsDegrees= jetsOptions >> o -> R -> (
 
 --Jets (Main Method)------------------------------------------------------
 
-jets= method(Options=>jetsOptions);
+jets = method(Options=>jetsOptions);
 
-jets(ZZ,PolynomialRing):= PolynomialRing => o -> (n,R) -> (
+jets(ZZ,PolynomialRing) := PolynomialRing => o -> (n,R) -> (
     if n<0 then error("jets order must be a non-negative integer");
     if not isCommutative R then error("jets method does not support noncommutative rings");
     
     --name to assign "storage" hashtable to be cached in the base ring
-    typeName:= if o.Projective then (projet) else (jet);
-    jetDegs:= null;--initialize degree list for jets variables
+    typeName := if o.Projective then (projet) else (jet);
+    jetDegs := null;--initialize degree list for jets variables
 
     if not R#? typeName then (
-	jetDegs= if o.Projective then degGenerator(0, R) else degrees R;
-	R#typeName= new CacheTable from {
+	jetDegs = if o.Projective then degGenerator(0, R) else degrees R;
+	R#typeName = new CacheTable from {
 	    (symbol jetsMaxOrder)=> 0,
 	    (symbol jetsRing)=> coefficientRing R[jetsVariables(0,R), 
 		                                 Join=> false,
 					 	 Degrees=> jetDegs],
 	    }
 	);
-    m:= R#typeName#jetsMaxOrder;
-    S:= R#typeName#jetsRing;
+    m := R#typeName#jetsMaxOrder;
+    S := R#typeName#jetsRing;
     
     --build jet ring tower incrementally up to order n
     if n>m then (
 	for i from m+1 to n do(
-    	    jetDegs= if o.Projective then degGenerator(i,R) else degrees R; 
-	    S= S[jetsVariables(i,R), 
+    	    jetDegs = if o.Projective then degGenerator(i,R) else degrees R; 
+	    S = S[jetsVariables(i,R), 
 		Join=> false, 
 		Degrees=> jetDegs];
             );
-     	R#typeName#jetsMaxOrder= n;
-	R#typeName#jetsRing= S;
+     	R#typeName#jetsMaxOrder = n;
+	R#typeName#jetsRing = S;
 	) else if m>n then (
 	for i from 0 to m-n-1 do (
-	    S= coefficientRing S;
+	    S = coefficientRing S;
 	    )
 	);
     
-    S#jetsInfo= new CacheTable from {
+    S#jetsInfo = new CacheTable from {
 	(symbol jetsBase)=> R,
 	(symbol Projective)=> o.Projective
 	}; 
     return S;
     )
 
-jets(ZZ,Ideal):= Ideal => o -> (n,I) -> (
+jets(ZZ,Ideal) := Ideal => o -> (n,I) -> (
     if n<0 then error("jets order must be a non-negative integer");
 
-    R:= ring I;
-    S:= null;--initializes jets ring
-    t:= local t;--initializes truncation variable
+    R := ring I;
+    S := null;--initializes jets ring
+    t := local t;--initializes truncation variable
     
-    typeName:= if o.Projective then (projet) else (jet);
+    typeName := if o.Projective then (projet) else (jet);
     
     if not I.cache#? typeName then (
-	S= jets(0,R, Projective=> o.Projective);
-	I.cache#typeName= new CacheTable from {
+	S = jets(0,R, Projective=> o.Projective);
+	I.cache#typeName = new CacheTable from {
 	    (symbol jetsMaxOrder)=> 0,
 	    (symbol jetsMatrix)=> (map(S,R,vars S)) gens I
 	    };
     	);
    
-    m:= I.cache#typeName#jetsMaxOrder;
+    m := I.cache#typeName#jetsMaxOrder;
     
     --calculate higher order entries if needed
     if n>m then (
-	S= jets(n,R, Projective=> o.Projective);
-    	(Tdegrees, degreeMap):= jetsDegrees (R, Projective=> o.Projective);
-	T:= S[t, Degrees=> Tdegrees, Join=> false]/(ideal(t^(n+1)));
+	S = jets(n,R, Projective=> o.Projective);
+    	(Tdegrees, degreeMap) := jetsDegrees (R, Projective=> o.Projective);
+	T := S[t, Degrees=> Tdegrees, Join=> false]/(ideal(t^(n+1)));
 
 	--a row matrix of substitution polynomials in t with coefficients
 	--in the jets ring. Calculated incrementally from variables of each
 	--level of the tower.
-	tempS:= S;
-	Tpolys:= sum join(
+	tempS := S;
+	Tpolys := sum join(
 	    (for i from 0 to n-1 list(
 		    promote(matrix t^(n-i),T) * vars tempS
 		    ) do (
-		    tempS= coefficientRing tempS)),
+		    tempS = coefficientRing tempS)),
 	    {promote (matrix t^0,T) * vars tempS}
 	    );
 	
-    	phi:= map(T,R,Tpolys,DegreeMap=> degreeMap);
+    	phi := map(T,R,Tpolys,DegreeMap=> degreeMap);
 
 	--a list of generators for I is obtained to avoid dropping/repeating
-	geners:= I_*;
+	geners := I_*;
     	--condition determining if all generators of the ideal are constants
-	constCond:= all(geners,isConstant);
+	constCond := all(geners,isConstant);
     	--add dummy generator to avoid loss of zeros
-	gensI:= if constCond then matrix{geners|{R_0}} else matrix{geners};
-    	(d,c):= coefficients(phi gensI);
+	gensI := if constCond then matrix{geners | {R_0}} else matrix{geners};
+    	(d,c) := coefficients(phi gensI);
     	--remove dummy generators if necessary
 	if constCond then (
-		L:= entries c;
-		c= matrix (for l in L list drop(l,-1));
+		L := entries c;
+		c = matrix (for l in L list drop(l,-1));
 		);
 
-	resultMatrix:= lift(c,S);
+	resultMatrix := lift(c,S);
 
 	--update value in ideal cache
-	I.cache#typeName#jetsMatrix= resultMatrix;
-	I.cache#typeName#jetsMaxOrder= n;
+	I.cache#typeName#jetsMatrix = resultMatrix;
+	I.cache#typeName#jetsMaxOrder = n;
 	m=n;
 	);
    
     --retrieve ideal of appropriate order
-    JMatrix:= I.cache#typeName#jetsMatrix; 
+    JMatrix := I.cache#typeName#jetsMatrix; 
     if zero JMatrix then return ideal(0_(jets(n,R)));
-    f:= map(jets(n,R,Projective=> o.Projective),jets(m,R, Projective=> o.Projective));
-    J:= f ideal (JMatrix^{m-n..m});
+    f := map(jets(n,R,Projective=> o.Projective),jets(m,R, Projective=> o.Projective));
+    J := f ideal (JMatrix^{m-n..m});
 
-    J.cache#jetsInfo= new CacheTable from {
+    J.cache#jetsInfo = new CacheTable from {
 	jetsBase=> I,
 	Projective=> o.Projective
 	};
@@ -235,19 +235,19 @@ jets(ZZ,Ideal):= Ideal => o -> (n,I) -> (
     return J;
     )
 
-jets(ZZ,QuotientRing):= QuotientRing => o -> (n,R) -> (
+jets(ZZ,QuotientRing) := QuotientRing => o -> (n,R) -> (
     if n<0 then error("jets order must be a non-negative integer");
-    splitQuotient:= presentation R;
-    ambientRing:= ring splitQuotient;
-    base:= null; --jets ring to be used in quotient
-    modI:= null; --jets ideal to be used in quotient
-    Q:= null; --variable to store quotient ring
+    splitQuotient := presentation R;
+    ambientRing := ring splitQuotient;
+    base := null; --jets ring to be used in quotient
+    modI := null; --jets ideal to be used in quotient
+    Q := null; --variable to store quotient ring
     
-    typeName:= if o.Projective then (projet) else (jet);
+    typeName := if o.Projective then (projet) else (jet);
     if not R#? typeName then (
-	base= jets(0, ambientRing, Projective=> o.Projective);
-	modI= jets(0, ideal(splitQuotient), Projective=> o.Projective);
-	R#typeName= new CacheTable from {
+	base = jets(0, ambientRing, Projective=> o.Projective);
+	modI = jets(0, ideal(splitQuotient), Projective=> o.Projective);
+	R#typeName = new CacheTable from {
 	    (symbol jetsRing)=> new CacheTable from {
 		0 => base/modI
 		},
@@ -258,13 +258,13 @@ jets(ZZ,QuotientRing):= QuotientRing => o -> (n,R) -> (
     --ring and a jets ideal.  Each order of the quotient is stored in a
     --cache table with the integer value of the order as the key    
     if R#typeName#jetsRing#? n then (
-	Q= R#typeName#jetsRing#n;
+	Q = R#typeName#jetsRing#n;
 	) else (
-	base= jets(n, ambientRing, Projective=> o.Projective);
-	modI= jets(n, ideal(splitQuotient), Projective=> o.Projective);
-	Q= base/modI;
-	R#typeName#jetsRing#n= Q;
-	Q#jetsInfo= new CacheTable from {
+	base = jets(n, ambientRing, Projective=> o.Projective);
+	modI = jets(n, ideal(splitQuotient), Projective=> o.Projective);
+	Q = base/modI;
+	R#typeName#jetsRing#n = Q;
+	Q#jetsInfo = new CacheTable from {
     	    jetsBase=> R,
        	    Projective=> o.Projective
 	    }
@@ -274,15 +274,15 @@ jets(ZZ,QuotientRing):= QuotientRing => o -> (n,R) -> (
     )
 
 
-jets(ZZ,RingMap):= RingMap => o -> (n,phi) -> (
+jets(ZZ,RingMap) := RingMap => o -> (n,phi) -> (
     if n<0 then error("jets order must be a non-negative integer");
-    I:= ideal(phi.matrix);
-    typeName:= if o.Projective then (projet) else (jet);
+    I := ideal(phi.matrix);
+    typeName := if o.Projective then (projet) else (jet);
     
     -- check whether jets have been calculated for this map
     if (not phi.cache#? typeName) then (
 	jets(0,I, Projective=> o.Projective);
-	phi.cache#typeName= new CacheTable from {
+	phi.cache#typeName = new CacheTable from {
 	    (symbol jetsMaxOrder)=> 0,
     	    (symbol jetsMatrix)=> (map(jets(0,phi.target, Projective=> o.Projective),
 		    	    	       jets(0,phi.source, Projective=> o.Projective),
@@ -290,31 +290,31 @@ jets(ZZ,RingMap):= RingMap => o -> (n,phi) -> (
 	    };
 	);
 
-    JR:= jets(n,phi.source, Projective=> o.Projective);
-    JS:= jets(n,phi.target, Projective=> o.Projective);
-    targets:= null;
+    JR := jets(n,phi.source, Projective=> o.Projective);
+    JS := jets(n,phi.target, Projective=> o.Projective);
+    targets := null;
     
     --check whether lower order jets have already been calculated
-    m:= phi.cache#typeName#jetsMaxOrder;
+    m := phi.cache#typeName#jetsMaxOrder;
     if m < n then (
 	jets(n,I, Projective=> o.Projective);
-    	targets= (I.cache#typeName#jetsMatrix);	
-	phi.cache#typeName#jetsMaxOrder= n;
-	phi.cache#typeName#jetsMatrix= targets;
+    	targets = (I.cache#typeName#jetsMatrix);	
+	phi.cache#typeName#jetsMaxOrder = n;
+	phi.cache#typeName#jetsMatrix = targets;
     	) else (
-    	targets= phi.cache#typeName#jetsMatrix^{m-n..m};
+    	targets = phi.cache#typeName#jetsMatrix^{m-n..m};
 	--need to lift 'targets' to jets of order m-n
 	targets=lift(targets,JS);
 	);
 
 --DegreeMap and DegreeLift options are set up but may not work as expected
-    psi:= map(JS,JR,
+    psi := map(JS,JR,
 	flatten transpose targets
 --	,DegreeLift=> degreeLift,
 --	DegreeMap=> degreeMap
     );
 
-    psi.cache#jetsInfo= new CacheTable from {
+    psi.cache#jetsInfo = new CacheTable from {
     	jetsBase=> phi,
     	Projective=> o.Projective
     	};	  
@@ -322,7 +322,7 @@ jets(ZZ,RingMap):= RingMap => o -> (n,phi) -> (
     return psi;
    )
 
-jets(ZZ,Graph):= Graph => o -> (n,G) -> (
+jets(ZZ,Graph) := Graph => o -> (n,G) -> (
     if n<0 then error("jets order must be a non-negative integer");
     --get the list of edges of the jets of the (hyper)graph
     --ring is flattened because graphs don't play well with towers of rings
@@ -331,7 +331,7 @@ jets(ZZ,Graph):= Graph => o -> (n,G) -> (
     graph E
     )
 
-jets(ZZ,HyperGraph):= HyperGraph => o -> (n,G) -> (
+jets(ZZ,HyperGraph) := HyperGraph => o -> (n,G) -> (
     if n<0 then error("jets order must be a non-negative integer");
     --get the list of edges of the jets of the (hyper)graph
     --ring is flattened because graphs don't play well with towers of rings
@@ -340,10 +340,10 @@ jets(ZZ,HyperGraph):= HyperGraph => o -> (n,G) -> (
     hyperGraph E
     )
 
-jets(ZZ,AffineVariety):= o -> (n,V) -> (
+jets(ZZ,AffineVariety) := o -> (n,V) -> (
     if n<0 then error("jets order must be a non-negative integer");
-    R:= ring V;
-    JR:= jets(n,R,Projective=> o.Projective);
+    R := ring V;
+    JR := jets(n,R,Projective=> o.Projective);
     if o.Projective then return Proj JR else return Spec JR;
     )
 
@@ -351,18 +351,18 @@ jets(ZZ,AffineVariety):= o -> (n,V) -> (
 
 --to potentially reduce computation time for monomial jet ideals  
 --(see documentation)
-jetsRadical= method(TypicalValue=>Ideal);
+jetsRadical = method(TypicalValue=>Ideal);
 
-jetsRadical(ZZ,Ideal):= (n,I) -> (
+jetsRadical(ZZ,Ideal) := (n,I) -> (
 
     if n<0 then error("jets order must be a non-negative integer");
     
     if isMonomialIdeal I then (
-	baseIdeal:= jets(n,I);
-	R:= ring I;
-	gensList:= flatten entries gens baseIdeal;
-	termList:= apply(gensList, t-> terms(coefficientRing R, t));
-	squarefreeGens:= apply(apply(flatten termList, support),product);
+	baseIdeal := jets(n,I);
+	R := ring I;
+	gensList := flatten entries gens baseIdeal;
+	termList := apply(gensList, t-> terms(coefficientRing R, t));
+	squarefreeGens := apply(apply(flatten termList, support),product);
 	ideal(squarefreeGens)
 	) else (
 	radical jets(n,I)
@@ -372,10 +372,10 @@ jetsRadical(ZZ,Ideal):= (n,I) -> (
 
 --to create a map sending elements of a jets ring to a jets ring of
 --higher order
-jetsProjection= method(Options=>jetsOptions,TypicalValue=>RingMap);
+jetsProjection = method(Options=>jetsOptions,TypicalValue=>RingMap);
 
-jetsProjection(ZZ,ZZ,PolynomialRing):=
-jetsProjection(ZZ,ZZ,QuotientRing):= o -> (t,s,R) -> (
+jetsProjection(ZZ,ZZ,PolynomialRing) :=
+jetsProjection(ZZ,ZZ,QuotientRing) := o -> (t,s,R) -> (
 
     if t < s then error("first argument must be less than or equal to the second");    
     if t<0 or s<0 then error("jets orders must be non-negative integers");
@@ -432,7 +432,7 @@ beginDocumentation()
 -- TESTS
 ----------------------------------------------------------------------
 TEST ///
-    R= QQ[x,y,z];
+    R = QQ[x,y,z];
     assert(degrees jets(2,R)==={{1}, {1}, {1}})
     assert(degrees jets(2,R,Projective=> true) === {{2}, {2}, {2}})
     I=ideal(y-x^2,z-x^3);
@@ -442,17 +442,17 @@ TEST ///
 
 --for non uniform degrees
 TEST ///
-    R= QQ[x,y,z, Degrees=> {2,3,1}];
+    R = QQ[x,y,z, Degrees=> {2,3,1}];
     assert(degrees jets(2,R)==={{2}, {3}, {1}})
     assert(degrees jets(2,R,Projective=> true) === {{2}, {2}, {2}})
-    I= ideal(x*y, x*z^2);
-    J= ideal(x^3-y*z^3, y+x*z);
+    I = ideal(x*y, x*z^2);
+    J = ideal(x^3-y*z^3, y+x*z);
     assert(isHomogeneous jets(2,I))
     assert(isHomogeneous jets(2,I,Projective=>true))
     assert(isHomogeneous jets(2,J))
     assert(isHomogeneous jets(2,J,Projective=>true))
-    X= radical jets(2,I);
-    Y= jetsRadical(2,I);
+    X = radical jets(2,I);
+    Y = jetsRadical(2,I);
     assert(X == Y)
     assert(mingens X === mingens Y);
 ///
@@ -460,10 +460,10 @@ TEST ///
 TEST ///
     R=QQ[x,y, Degrees=> {2,3}];
     S=QQ[a,b,c, Degrees=> {1,1,2}]
-    phi= map(S,R, {a^2 + c, b*c});
-    f= jets(2,phi);
-    testx= c2+2*a0*a2+a1^2;
-    testy= b0*c2+c0*b2+b1*c1;
+    phi = map(S,R, {a^2 + c, b*c});
+    f = jets(2,phi);
+    testx = c2+2*a0*a2+a1^2;
+    testy = b0*c2+c0*b2+b1*c1;
     assert(f x2===testx)
     assert(f y2===testy)
     assert(isHomogeneous jets(3,phi))
@@ -473,17 +473,17 @@ TEST ///
 --for ideals with constant generators
 TEST ///
     R=QQ[x]
-    I0= ideal(2_R)
+    I0 = ideal(2_R)
     Ftest0=jets(2,I0)
     assert(Ftest0==jets(2,R))
-    I1= ideal(2_R,x)
+    I1 = ideal(2_R,x)
     Ftest1=jets(2,I1)
-    assert(Ftest1== jets(2,R))
+    assert(Ftest1 == jets(2,R))
     S=ZZ[x]
-    J0= ideal(2_S)
-    Ztest0= jets(2,J0)
+    J0 = ideal(2_S)
+    Ztest0 = jets(2,J0)
     assert(Ztest0!=jets(2,S))
-    J1= ideal(2_S,x) 
+    J1 = ideal(2_S,x) 
     Ztest1=jets(2,J1)
     assert(Ztest1!=jets(2,S))
 ///
@@ -501,36 +501,36 @@ TEST ///
 --for quotients and varieties
 TEST ///
     R=QQ[x,y]
-    I= ideal(y^2,x^3)
+    I = ideal(y^2,x^3)
     Q=R/I
-    JR= jets(2,R)
-    JI= jets(2,I)
-    JQ= jets(2,Q)
+    JR = jets(2,R)
+    JI = jets(2,I)
+    JQ = jets(2,Q)
     assert(JR===ambient JQ)
     assert(JI===ideal JQ)
     assert(presentation (JR/JI)===presentation JQ)
-    V= Spec Q
-    JV= jets(2,V)
+    V = Spec Q
+    JV = jets(2,V)
     assert(ring JV===JQ)   
 ///
 
 --for graphs
 TEST ///
     R=QQ[x,y,z]
-    G= graph(R,{{x,y},{y,z},{x,z}})
-    JG= jets(1,G)
-    JR= jets(1,R)
+    G = graph(R,{{x,y},{y,z},{x,z}})
+    JG = jets(1,G)
+    JR = jets(1,R)
     use ring JG
-    test= {{x0,y0},{x0,z0},{y0,z0},{x1,y0},{x1,z0},{y1,x0},{y1,z0},{z1,x0},{z1,y0}}
+    test = {{x0,y0},{x0,z0},{y0,z0},{x1,y0},{x1,z0},{y1,x0},{y1,z0},{z1,x0},{z1,y0}}
     assert((set edges JG) === (set test))
 ///
 
 --for projections
 TEST ///
     R=QQ[x,y,z]
-    I= ideal(y-x^2,z-x^3)
-    JI= jets(1,I)
-    p= jetsProjection(3,1,R)
+    I = ideal(y-x^2,z-x^3)
+    JI = jets(1,I)
+    p = jetsProjection(3,1,R)
     assert(ring p JI === jets(3,R))
 ///
 ----------------------------------------------------------------------
@@ -612,7 +612,7 @@ Node
 	    
 	    For polynomial rings, data is stored under @TT "*.jet"@.
     	Example
-	    R= QQ[x,y]
+	    R = QQ[x,y]
 	    R.?jet
 	    jets(3,R)
 	    R.?jet
@@ -628,7 +628,7 @@ Node
 	    Generators for lower orders are recovered from this matrix
 	    without additional computations.
     	Example
-	    I= ideal (x^2 - y)
+	    I = ideal (x^2 - y)
 	    I.cache.?jet
 	    elapsedTime jets(3,I)
 	    I.cache.?jet
@@ -641,7 +641,7 @@ Node
 	    that is stored separately under @TT "*.jet.jetsRing"@
 	    (order zero jets are always included by default).
     	Example
-	    Q= R/I
+	    Q = R/I
 	    Q.?jet
 	    jets(3,Q)
 	    Q.?jet
@@ -655,8 +655,8 @@ Node
 	    Lower orders map are recovered from this matrix
 	    without additional computations.
     	Example
-	    S= QQ[t]
-	    f= map(S,Q,{t,t^2})
+	    S = QQ[t]
+	    f = map(S,Q,{t,t^2})
 	    isWellDefined f
 	    f.cache.?jet
 	    elapsedTime jets(3,f)
@@ -704,8 +704,8 @@ Node
 	    in all lower orders.  The grading or multigrading of the jets ring 
 	    follows from that of the base ring.
     	Example	    
-	    R= QQ[x,y,z,Degrees=>{2,1,3}]
-	    JR= jets(2,R)
+	    R = QQ[x,y,z,Degrees=>{2,1,3}]
+	    JR = jets(2,R)
 	    describe JR
     	    degrees (flattenRing JR)_0	    
     	Text
@@ -715,7 +715,7 @@ Node
 	    	Jets via Hasse-Schmidt Derivations")@.
     	Example
 	    R=QQ[x,y,z,Degrees=>{2,1,3}]
-	    JR= jets(2,R,Projective=>true)
+	    JR = jets(2,R,Projective=>true)
 	    degrees (flattenRing JR)_0
     	Text
 	    The convention for labeling variables in the jets of polynomial ring
@@ -723,7 +723,7 @@ Node
 	    base ring. Existing subscripts are preserved.
     	Example
 	    A=QQ[a_1..a_3]
-	    JA= jets(1,A)
+	    JA = jets(1,A)
 	    describe JA
     	Text
 	    Note that the coefficient ring of the polynomial ring does not need
@@ -732,7 +732,7 @@ Node
     	Example
 	    Zi=ZZ[i]/ideal(i^2+1)
 	    B=Zi[b_1..b_3]
-	    JB= jets(1,B)
+	    JB = jets(1,B)
 	    describe JB
     Caveat
     	With @TT "Projective=>true"@ the jet variables of order zero have degree 0,
@@ -758,9 +758,9 @@ Node
 	    This function is provided by the package
 	    @TO Jets@.
     	Example	    
-	    R= QQ[x,y]
-	    I= ideal (x^3 + y^3 - 3*x*y)
-    	    J= jets(3,I);
+	    R = QQ[x,y]
+	    I = ideal (x^3 + y^3 - 3*x*y)
+    	    J = jets(3,I);
 	    netList J_*
 	Text
 	    When the @TO [jets,Projective]@ option is set to true, the degree
@@ -770,11 +770,11 @@ Node
 	    As a result, the jets of any ideal will be homogeneous regardless
 	    of the homogeneity of the base ideal, or that of its affine jets.
 	Example
-	    R= QQ[x,y,z]
-	    I= ideal (y-x^2, z-x^3)
-	    JI= jets(2,I)
+	    R = QQ[x,y,z]
+	    I = ideal (y-x^2, z-x^3)
+	    JI = jets(2,I)
 	    isHomogeneous JI
-	    JIproj= jets(2,I,Projective=>true)
+	    JIproj = jets(2,I,Projective=>true)
 	    isHomogeneous JIproj
     Caveat
     	With @TT "Projective=>true"@ the jet variables of order zero have degree 0,
@@ -800,10 +800,10 @@ Node
 	    @TO (jets,ZZ,PolynomialRing)@ of the ambient ring of @TT "Q"@ with 
 	    @TO (jets,ZZ,Ideal)@ of the ideal defining @TT "Q"@
     	Example	    
-	    R= QQ[x,y];
-	    I= ideal(y^2-x^3);
-    	    Q= R/I;
-	    JQ= jets(2,Q);
+	    R = QQ[x,y];
+	    I = ideal(y^2-x^3);
+    	    Q = R/I;
+	    JQ = jets(2,Q);
 	    describe JQ
     Caveat
     	Forming quotients triggers a Groebner basis computation, which may be time consuming.
@@ -826,20 +826,20 @@ Node
 	    This function is provided by the package
 	    @TO Jets@.
     	Example	    
-	    R= QQ[x,y,z]
-	    S= QQ[t]
-	    f= map(S,R,{t,t^2,t^3})
-	    Jf= jets(2,f);
+	    R = QQ[x,y,z]
+	    S = QQ[t]
+	    f = map(S,R,{t,t^2,t^3})
+	    Jf = jets(2,f);
 	    matrix Jf
     	Text
 	    This function can also be applied when the source and/or the target
 	    of the ring homomorphism are quotients of a polynomial ring
     	Example
-	    I= ideal(y-x^2,z-x^3)
-	    Q= R/I
-	    g= map(S,Q,{t,t^2,t^3})
+	    I = ideal(y-x^2,z-x^3)
+	    Q = R/I
+	    g = map(S,Q,{t,t^2,t^3})
 	    isWellDefined g
-	    Jg= jets(2,g);
+	    Jg = jets(2,g);
 	    isWellDefined Jg
 
 Node
@@ -869,15 +869,15 @@ Node
 	    the @TO EdgeIdeals@ package, which is automatically exported
 	    when loading @TO Jets@.
     	Example	    
-	    R= QQ[x,y,z]
-	    G= graph(R,{{x,y},{y,z}})
-	    JG= jets(2,G)
+	    R = QQ[x,y,z]
+	    G = graph(R,{{x,y},{y,z}})
+	    JG = jets(2,G)
 	    vertexCovers JG
 	Text
 	    We can also calculate the jets of a  @TO "EdgeIdeals::HyperGraph"@.
 	Example
-	    R= QQ[u,v,w,x,y,z]
-	    H= hyperGraph(R,{{u},{v,w},{x,y,z}})
+	    R = QQ[u,v,w,x,y,z]
+	    H = hyperGraph(R,{{u},{v,w},{x,y,z}})
     	    jets(1,H)
     Caveat
         Rings of jets are usually constructed as towers of rings with
@@ -905,8 +905,8 @@ Node
 	    Returns the jets of an @TO AffineVariety@ as an @TO AffineVariety@. 
 	Example
 	    R=QQ[x,y]
-	    I= ideal(y^2-x^2*(x+1))
-	    A= Spec(R/I)
+	    I = ideal(y^2-x^2*(x+1))
+	    A = Spec(R/I)
 	    jets(2,A)
     	Text
 	    If @TO [jets,Projective]@ is set to true, then jets are computed
@@ -1100,20 +1100,20 @@ Node
 	    
 	    An ideal generated by squarefree monomials:
 	Example
-	    R= QQ[x,y,z]
-	    I= ideal (x*z, y*z)
-	    J= jets(1,I); 
-	    MP= radical J;
-	    GS= jetsRadical(1,I);
+	    R = QQ[x,y,z]
+	    I = ideal (x*z, y*z)
+	    J = jets(1,I); 
+	    MP = radical J;
+	    GS = jetsRadical(1,I);
 	    netList sort MP_* | netList sort GS_*
     	Text
 	    An ideal with genereators which are not squarefree:
 	Example
-	    R= QQ[x,y,z]
-	    I= ideal(x*y^2, z*x, x^3)
-	    J= jets(1,I); 
-	    MP= radical J;
-	    GS= jetsRadical(1,I);
+	    R = QQ[x,y,z]
+	    I = ideal(x*y^2, z*x, x^3)
+	    J = jets(1,I); 
+	    MP = radical J;
+	    GS = jetsRadical(1,I);
 	    netList sort MP_* | netList sort GS_*
 	    MP == GS
 
@@ -1144,9 +1144,9 @@ Node
 	    
     	Example
 	    R=QQ[x,y]
-	    f= jetsProjection(5,2,R)
+	    f = jetsProjection(5,2,R)
 	    use jets(2,R)
-	    p= (x2 + 2*x1*y1 + x0*y2^2)
+	    p = (x2 + 2*x1*y1 + x0*y2^2)
 	    f p
 
 Node
@@ -1244,8 +1244,8 @@ Node
     	Text
 	    Shorthand for @TO jets@
 	Example
-	    R= QQ[x,y]
-	    I= ideal(y^2-x^3)
+	    R = QQ[x,y]
+	    I = ideal(y^2-x^3)
 	    JJ_2 R
 	    JJ_2 I
 
