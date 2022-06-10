@@ -105,7 +105,7 @@ jetsDegrees = jetsOptions >> o -> R -> (
 	Tdegrees = {degree 1_R};
 	degreeMap = identity;
 	);
-    return (Tdegrees, degreeMap);
+    (Tdegrees, degreeMap)
     ) 
 
 
@@ -158,7 +158,7 @@ jets(ZZ,PolynomialRing) := PolynomialRing => o -> (n,R) -> (
 	(symbol jetsBase)=> R,
 	(symbol Projective)=> o.Projective
 	}; 
-    return S;
+    S
     )
 
 jets(ZZ,Ideal) := Ideal => o -> (n,I) -> (
@@ -232,7 +232,7 @@ jets(ZZ,Ideal) := Ideal => o -> (n,I) -> (
 	Projective=> o.Projective
 	};
     
-    return J;
+    J
     )
 
 jets(ZZ,QuotientRing) := QuotientRing => o -> (n,R) -> (
@@ -270,7 +270,7 @@ jets(ZZ,QuotientRing) := QuotientRing => o -> (n,R) -> (
 	    }
 	);
     
-    return Q;
+    Q
     )
 
 
@@ -319,7 +319,7 @@ jets(ZZ,RingMap) := RingMap => o -> (n,phi) -> (
     	Projective=> o.Projective
     	};	  
     
-    return psi;
+   psi
    )
 
 jets(ZZ,Graph) := Graph => o -> (n,G) -> (
