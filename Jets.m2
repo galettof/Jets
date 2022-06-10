@@ -70,6 +70,7 @@ jetsOptions = {
 ---------------------------------------------------------------------------
 --create new-tier variables for jets ring
 --by appending the order n as a string to the variable names
+-*
 jetsVariables = (n,R) -> (
     symList := apply(gens R, baseName);
     nString := toString n;
@@ -83,6 +84,19 @@ jetsVariables = (n,R) -> (
 	    )
         );
     varNames = apply(varNames,value)
+    )
+*-
+jetsVariables= (n,R) -> (
+    symList := apply(gens R, baseName);
+    nString := toString n;
+    for s in symList list (
+        if instance(s,IndexedVariable) then (
+	    name := (toString s#0) | nString;
+	    (getSymbol name)_(s#1)
+            ) else (
+	    getSymbol (toString s | nString)
+	    )
+    	)
     )
 
 --generate degree list for order n jets variables
