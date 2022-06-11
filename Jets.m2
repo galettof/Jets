@@ -216,7 +216,7 @@ jets(ZZ,Ideal) := Ideal => o -> (n,I) -> (
 	constCond := all(geners,isConstant);
     	--add dummy generator to avoid loss of zeros
 	gensI := if constCond then matrix{geners | {R_0}} else matrix{geners};
-    	(d,c) := coefficients(phi gensI);
+    	c := last coefficients(phi gensI);
     	--remove dummy generators if necessary
 	if constCond then (
 		L := entries c;
