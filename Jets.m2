@@ -218,13 +218,8 @@ jets(ZZ,Ideal) := Ideal => o -> (n,I) -> (
 	gensI := if constCond then matrix{geners | {R_0}} else matrix{geners};
     	c := last coefficients(phi gensI);
     	--remove dummy generators if necessary
-	if constCond then (
-		L := entries c;
-		c = matrix (for l in L list drop(l,-1));
-		);
-
+	if constCond then c = c_{0..(numColumns c - 2)};
 	resultMatrix := lift(c,S);
-
 	--update value in ideal cache
 	I.cache#typeName#jetsMatrix = resultMatrix;
 	I.cache#typeName#jetsMaxOrder = n;
@@ -317,13 +312,7 @@ jets(ZZ,RingMap) := RingMap => o -> (n,phi) -> (
 	targets=lift(targets,JS);
 	);
 
---DegreeMap and DegreeLift options are set up but may not work as expected
-    psi := map(JS,JR,
-	flatten transpose targets
---	,DegreeLift=> degreeLift,
---	DegreeMap=> degreeMap
-    );
-
+    psi := map(JS,JR,flatten transpose targets);
     psi.cache#jetsInfo = new CacheTable from {
     	jetsBase=> phi,
     	Projective=> o.Projective
