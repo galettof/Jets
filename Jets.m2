@@ -101,11 +101,7 @@ jetsVariables= (n,R) -> (
 
 --generate degree list for order n jets variables
 --this is used to create the rings of projective jets
-degGenerator = (n,R) -> (
-    for d in degrees R list (
-	for l in d list n
-	)
-    )
+degGenerator = (n,R) -> apply(degrees R, d -> toList((#d):n))
 
 --generate degrees/map for truncation ring in ideal calculation
 jetsDegrees = jetsOptions >> o -> R -> (
