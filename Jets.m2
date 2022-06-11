@@ -34,7 +34,7 @@ newPackage(
      Headline => "compute jets of various algebraic, geometric and combinatorial objects",
      PackageImports => {"SimpleDoc","EdgeIdeals"},
      PackageExports => {"EdgeIdeals"},
-     DebuggingMode => true
+     DebuggingMode => false
      )
 
 
