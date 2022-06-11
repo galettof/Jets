@@ -510,15 +510,15 @@ TEST ///
 
 --for quotients and varieties
 TEST ///
-    R=QQ[x,y]
+    R = QQ[x,y]
     I = ideal(y^2,x^3)
-    Q=R/I
+    Q = R/I
     JR = jets(2,R)
     JI = jets(2,I)
     JQ = jets(2,Q)
-    assert(JR == =ambient JQ)
-    assert(JI == =ideal JQ)
-    assert(presentation (JR/JI) == =presentation JQ)
+    assert(JR === ambient JQ)
+    assert(JI === ideal JQ)
+    assert(presentation (JR/JI) === presentation JQ)
     V = Spec Q
     JV = jets(2,V)
     assert(ring JV === JQ)   
