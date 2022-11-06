@@ -699,7 +699,7 @@ Node
     	Text
 	    This function is provided by the package @TO Jets@.  Rings are 
 	    constructed incrementally as towers.  The function returns the 
-	    ring with variables in the jets order requested, and coeffients 
+	    ring with variables in the jets order requested, and coefficients 
 	    in all lower orders.  The grading or multigrading of the jets ring 
 	    follows from that of the base ring.
     	Example	    
@@ -1106,7 +1106,7 @@ Node
 	    GS = jetsRadical(1,I);
 	    netList sort MP_* | netList sort GS_*
     	Text
-	    An ideal with genereators which are not squarefree:
+	    An ideal with generators which are not squarefree:
 	Example
 	    R = QQ[x,y,z]
 	    I = ideal(x*y^2, z*x, x^3)
