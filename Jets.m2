@@ -402,6 +402,8 @@ JJ = new ScriptedFunctor from {
  
 --compute an ideal whose vanishing locus is the
 --principal component of the jets of an ideal
+--changed in v1.2 with a faster algorithm for monomial ideals
+--and to fix the behavior for reducible varieties
 principalComponent = method(Options=>{Saturate=>true},TypicalValue=>Ideal)
 principalComponent(ZZ,Ideal) := o -> (n,I) -> (
     if n<0 then error("jets order must be a non-negative integer");
