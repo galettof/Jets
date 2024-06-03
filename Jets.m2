@@ -570,6 +570,11 @@ Node
 	    the radical of jets of monomial ideals, a function
 	    to construct jets of graphs, a method for principal components of jets,
 	    and an option for jets with "projective" gradings.
+
+	    @HEADER4 "Version history:"@
+	    
+	    @UL {(BOLD "1.2: ", "Better method for principal components.")
+		}@
     References
     	@arXiv("math/0612862","L. Ein and M. Mustaţă,
     		Jet schemes and singularities.")@
