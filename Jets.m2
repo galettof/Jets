@@ -39,7 +39,7 @@ newPackage(
 
 
 
-importFrom(MinimalPrimes, {"radical"});
+importFrom(MinimalPrimes, {"radical","minimalPrimes"});
 
 export {
     "JJ",
