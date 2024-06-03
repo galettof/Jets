@@ -54,7 +54,9 @@ export {
     "jetsProjection",
     "jetsInfo",
     "principalComponent",
-    "Saturate"
+    "Saturate",
+    "liftingFunction",
+    "liftingMatrix"
     }
 
 jetsOptions = {
@@ -438,6 +440,38 @@ principalComponent(ZZ,Ideal) := o -> (n,I) -> (
     else (
 	JI:sing0
 	)
+    )
+
+-- the following methods (liftingFunction, liftingMatrix)
+-- follow the definitions in the paper by Galetto-Iammarino-Yu
+-- unexported recursive computation of lifting function
+lf = (s,j,k) -> (
+    -- deal with edge cases
+    if (k<j or k>(s+1)*j) then return 0_ZZ;
+    if (k==j) then return ((s+1)^j)_ZZ;
+    if (k==(s+1)*j) then return 1_ZZ;
+    -- recursive computation
+    sum(min(k,s+1), i -> binomial(s+1,i+1) * lf(s,j-1,k-i-1) )
+    )
+
+-- speeds up computation by storing values
+mlf = memoize lf
+
+-- lifting function method for user
+liftingFunction = method(TypicalValue => ZZ);
+liftingFunction(ZZ,ZZ,ZZ) := ZZ => (s,j,k) -> (
+    -- check arguments are nonnegative
+    if (s<0 or j<0 or k<0) then error("arguments should be nonnegative");
+    mlf(s,j,k)
+    )
+
+-- enter values of lifting function in a matrix
+-- row/column indices start at zero
+liftingMatrix = method(TypicalValue => Matrix);
+liftingMatrix(ZZ,ZZ,ZZ) := Matrix => (s,r,c) -> (
+    -- check arguments are nonnegative
+    if (s<0 or r<0 or c<0) then error("arguments should be nonnegative");
+    matrix table(r,c, (j,k) -> mlf(s,j,k) )
     )
 
 beginDocumentation()
