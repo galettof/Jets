@@ -412,17 +412,29 @@ principalComponent(ZZ,Ideal) := o -> (n,I) -> (
     p := jetsProjection(n,0,R);
     -- identify original ambient ring with 0-jets
     i := map(source p,R,vars source p);
-    --compute the singular locus of I
-    --map it to the zero jets via the map i
+    -- find minimal primes
+    mp := minimalPrimes I;
+    -- for monomial ideal use shortcut from Galetto-Iammarino-Yu
+    if isMonomialIdeal(I) then (
+	return intersect(apply(mp, P -> jets(n,P)));
+	);
+    --compute the singular locus of I by breaking up components
+    -- finding singular locus of each
+    singComp := apply(mp, P -> ideal singularLocus P);
+    -- then also intersecting components two at a time
+    pairwiseInt := apply(subsets(mp,2),sum);
+    -- and finally taking the union
+    sing := intersect(singComp|pairwiseInt);
+    --map the singular locus to the zero jets via the map i
     --then to the n jets via the map p
-    sing := p(i(ideal singularLocus I));
+    sing0 := p i sing;
     --default is to saturate JI wrt sing
     if o.Saturate then (
-    	saturate(JI,sing)
+    	saturate(JI,sing0)
 	)
     --if JI is radical, colon is enough
     else (
-	JI:sing
+	JI:sing0
 	)
     )
 
