@@ -339,7 +339,7 @@ jets(ZZ,HyperGraph) := HyperGraph => o -> (n,G) -> (
     hyperGraph E
     )
 
-jets(ZZ,AffineVariety) := o -> (n,V) -> (
+jets(ZZ,AffineVariety) := Variety => o -> (n,V) -> (
     if n<0 then error("jets order must be a non-negative integer");
     R := ring V;
     JR := jets(n,R,Projective=> o.Projective);
