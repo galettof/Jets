@@ -1498,8 +1498,61 @@ Node
     	invariants of principal jets of monomial ideals
     Description
     	Text
-	    Text
+	    This example follows Galetto-Iammarino-Yu (INSERT REF).
+	
+	    Consider the following squarefree monomial ideal in a standard graded polynomial ring.
 	Example
-	    R = QQ[x_(1,1)..x_(3,3)]
+	    R = QQ[v..z]
+	    I = ideal(v*w*x,x*y,y*z)
+	Text
+	    This is the Stanley-Reisner ideal of a simplicial complex $\Delta$
+	    whose $f$-vector we compute below.
+	Example
+	    needsPackage "SimplicialComplexes"
+	    Δ = simplicialComplex I
+	    f = matrix{fVector(Δ)}
+	Text
+	    Next, we construct the ideal $\mathcal{P}_1 (I)$ of principal 1-jets of $I$
+	    (see @TO "principalComponent"@ for details).
+	    This is also the Stanley-Reisner ideal of a simplicial complex
+	    $\Gamma_1$ and we can compute its $f$-vector.
+	Example
+	    P1 = principalComponent(1,I)
+	    phi = last flattenRing ring P1;
+	    Γ1 = simplicialComplex phi P1
+	    F = matrix{fVector Γ1}
+	Text
+	    The $f$-vector of $\Gamma_1$ can be obtained by multiplying
+	    the $f$-vector of $\Delta$ with a @TO "liftingMatrix"@ of the
+	    appropriate size.
+	Example
+	    L = liftingMatrix(1,4,7)
+	    F == f*L
+	Text
+	    There is a similar relation between the Betti numbers of
+	    the Stanley-Reisner rings $\Bbbk [\Delta]$
+	    and $\Bbbk [\Gamma_1]$. First, we compute the Betti
+	    diagram of $\Bbbk [\Delta]$ and turn it into a matrix by
+	    sliding the $i$-th row $i$ units to the right.
+	Example
+	    betti res I
+	    b = mutableMatrix(ZZ,3,5);
+	    scanPairs(betti res I, (k,v) -> b_(k_2-k_0,k_2) = v);
+	    b = matrix b
+	Text
+	    Next, we do the same with the Betti diagram of $\Bbbk [\Gamma_1]$.
+	Example
+	    betti res P1
+	    B = mutableMatrix(ZZ,3,9);
+	    scanPairs(betti res P1, (k,v) -> B_(k_2-k_0,k_2) = v);
+	    B = matrix B
+	Text
+	    The matrix containing the Betti numbers of $\Bbbk [\Gamma_1]$
+	    can be obtained by multiplying the matrix containing the Betti
+	    numbers of $\Bbbk [\Delta]$ with a @TO "liftingMatrix"@ of the
+	    appropriate size.
+	Example
+	    L = liftingMatrix(1,5,9)
+	    B == b*L
 ///
 end
