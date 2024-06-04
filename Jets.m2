@@ -644,6 +644,7 @@ Node
 	jetsProjection
 	jetsRadical
 	principalComponent
+	liftingFunction
 	:Examples from the literature
 	"Example 1"
 	"Example 2"
@@ -1321,6 +1322,48 @@ Node
 	    JJ_2 R
 	    JJ_2 I
 
+Node
+    Key
+    	liftingFunction
+    	(liftingFunction,ZZ,ZZ,ZZ)
+    Headline
+    	compute values of a lifting function
+    Usage
+    	liftingFunction(s,j,k)
+    Inputs
+	s:ZZ
+	    a natural number
+	j:ZZ
+	    a natural number
+	k:ZZ
+	    a natural number
+    Outputs
+    	:ZZ
+	 the number of cardinality $k$ lifts of a cardinality $j$ set under depolarization
+    Description
+    	Text
+	    This function was added in version 1.2 of the package @TO Jets@.
+
+	    Given a set $X$ and a natural number $s$, let $\mathcal{J}_s (X)$
+	    be the set that contains the elements $x_0,\dots,x_s$ for every
+	    element $x\in X$. The @EM "depolarization"@ map
+	    $\delta_s \colon \mathcal{J}_s (X)\to X$ is defined by
+	    $\delta_s (x_i) = x$ for every $x\in X$ and $i\in \{0,\dots,s\}$.
+
+	    The @EM "lifting function"@ $l_s (j,k)$ counts the number
+	    of subsets $V\subseteq \mathcal{J}_s (X)$ of cardinality $k$
+	    such that $\delta_s (V) = U$, where $U\subseteq X$ is a fixed
+	    subset of cardinality $j$. Note that this number does not
+	    depend on $U$ but only on its cardinality.
+	    See INSERT REF for computing this function.
+    	Example
+	    liftingFunction(1,2,3)
+	    liftingFunction(2,2,3)
+	    liftingFunction(1,3,2)
+	    liftingFunction(1,0,0)
+    Subnodes
+    	liftingMatrix
+	
 Node
     Key
     	"Example 1"
