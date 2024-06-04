@@ -648,6 +648,7 @@ Node
 	"Example 1"
 	"Example 2"
 	"Example 3"
+	"Example 4"
 	:Technical information
 	"Storing Computations"
 
@@ -1489,5 +1490,16 @@ Node
     	Example
 	    apply({P_0,I2}, X -> hilbertSeries(X,Reduce=>true))
 	    numerator (first oo) == (numerator last oo)^2
+
+Node
+    Key
+    	"Example 4"
+    Headline
+    	invariants of principal jets of monomial ideals
+    Description
+    	Text
+	    Text
+	Example
+	    R = QQ[x_(1,1)..x_(3,3)]
 ///
 end
