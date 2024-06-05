@@ -1366,6 +1366,36 @@ Node
 	
 Node
     Key
+    	liftingMatrix
+    	(liftingMatrix,ZZ,ZZ,ZZ)
+    Headline
+    	arrange values of lifting function in a matrix
+    Usage
+    	liftingMatrix(s,r,c)
+    Inputs
+	s:ZZ
+	    a natural number
+	r:ZZ
+	    a positive integer
+	c:ZZ
+	    a positive integer
+    Outputs
+    	:Matrix
+	 @TT "r"@ by @TT "c"@, whose entries are the values of the order @TT "s"@ lifting function
+    Description
+    	Text
+	    This function was added in version 1.2 of the package @TO Jets@.
+
+	    This function collects the values of the @TO "liftingFunction"@
+	    $l_s (j,k)$ and arranges them in an @TT "r"@ by @TT "c"@ matrix $L_s (j,k)$
+	    with row index $j\geqslant 0$ and column index $k\geqslant 0$.
+    	Example
+	    liftingMatrix(2,3,5)
+	Text
+	    For uses of the lifting matrix, see @TO "Example 4"@.
+	    
+Node
+    Key
     	"Example 1"
     Headline
     	jets of monomial ideals
