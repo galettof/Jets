@@ -470,7 +470,8 @@ liftingFunction(ZZ,ZZ,ZZ) := ZZ => (s,j,k) -> (
 liftingMatrix = method(TypicalValue => Matrix);
 liftingMatrix(ZZ,ZZ,ZZ) := Matrix => (s,r,c) -> (
     -- check arguments are nonnegative
-    if (s<0 or r<0 or c<0) then error("arguments should be nonnegative");
+    if (s<0) then error("first argument should be nonnegative");
+    if (r<=0 or c<=0) then error("second and third argument should be positive");
     matrix table(r,c, (j,k) -> mlf(s,j,k) )
     )
 
