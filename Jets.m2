@@ -457,7 +457,7 @@ lf = (s,j,k) -> (
     if (k==j) then return ((s+1)^j)_ZZ;
     if (k==(s+1)*j) then return 1_ZZ;
     -- recursive computation
-    sum(min(k,s+1), i -> binomial(s+1,i+1) * lf(s,j-1,k-i-1) )
+    sum(min(k,s+1), i -> binomial(s+1,i+1) * mlf(s,j-1,k-i-1) )
     )
 
 -- speeds up computation by storing values
@@ -1365,12 +1365,16 @@ Node
 	    such that $\delta_s (V) = U$, where $U\subseteq X$ is a fixed
 	    subset of cardinality $j$. Note that this number does not
 	    depend on $U$ but only on its cardinality.
-	    See INSERT REF for computing this function.
+	    See @arXiv("2407.01836","F. Galetto, N. Iammarino, and T. Yu,
+	    Jets and principal components of monomial ideals, and very well-covered graphs")@
+	    for computing this function.
     	Example
 	    liftingFunction(1,2,3)
 	    liftingFunction(2,2,3)
 	    liftingFunction(1,3,2)
 	    liftingFunction(1,0,0)
+	Text
+	    For uses of the lifting function, see @TO "Example 4"@.
     Subnodes
     	liftingMatrix
 	
