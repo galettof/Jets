@@ -1585,7 +1585,9 @@ Node
     	invariants of principal jets of monomial ideals
     Description
     	Text
-	    This example follows Galetto-Iammarino-Yu (INSERT REF).
+	    This follows Examples 7.5 and 7.7 in
+	    @arXiv("2407.01836","F. Galetto, N. Iammarino, and T. Yu,
+	    Jets and principal components of monomial ideals, and very well-covered graphs")@.
 	
 	    Consider the following squarefree monomial ideal in a standard graded polynomial ring.
 	Example
