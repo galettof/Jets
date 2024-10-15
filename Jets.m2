@@ -18,7 +18,7 @@
 newPackage(
      "Jets",
      Version => "1.2",
-     Date => "June 3, 2024",
+     Date => "October 15, 2024",
      AuxiliaryFiles => true,
      Authors => {
 	 {
@@ -630,7 +630,10 @@ Node
 
 	    @HEADER4 "Version history:"@
 	    
-	    @UL {(BOLD "1.2: ", "Better method for principal components.")
+	    @UL {(BOLD "1.1: ", "JSAG version."),
+		    (BOLD "1.2: ", "Improved method for principal components.
+		    Added methods for invariants of principal components
+		    of monomial ideals.")
 		}@
     References
     	@arXiv("math/0612862","L. Ein and M. Mustaţă,
