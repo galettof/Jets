@@ -406,9 +406,28 @@ JJ = new ScriptedFunctor from {
 --principal component of the jets of an ideal
 --changed in v1.2 with a faster algorithm for monomial ideals
 --and to fix the behavior for reducible varieties
+-- FG's note: I tried an option for bypassing the computation
+-- of minimal primes, but for some reason this method appears to
+-- work faster if minimal primes are found first
+-- (at least for 2x2 minors of a generic 3x3 matrix)
 principalComponent = method(Options=>{Saturate=>true},TypicalValue=>Ideal)
 principalComponent(ZZ,Ideal) := o -> (n,I) -> (
     if n<0 then error("jets order must be a non-negative integer");
+    -- find minimal primes
+    mp := minimalPrimes I;
+    -- for a monomial ideal use shortcut from Galetto-Iammarino-Yu
+    if isMonomialIdeal(I) then (
+	return intersect(apply(mp, P -> jets(n,P)));
+	);
+    -- compute the singular locus of I by breaking up components
+    -- and finding singular locus of each
+    -- (this is necessary as of v1.24.05 because the singularLocus
+    -- method only works for irreducible ideals)
+    singComp := apply(mp, P -> ideal singularLocus P);
+    -- then also intersect components two at a time
+    pairwiseInt := apply(subsets(mp,2),sum);
+    -- and finally take the union
+    sing := intersect(singComp|pairwiseInt);
     -- compute jets of I
     JI := jets(n,I);
     -- get the jets projection
@@ -416,19 +435,6 @@ principalComponent(ZZ,Ideal) := o -> (n,I) -> (
     p := jetsProjection(n,0,R);
     -- identify original ambient ring with 0-jets
     i := map(source p,R,vars source p);
-    -- find minimal primes
-    mp := minimalPrimes I;
-    -- for monomial ideal use shortcut from Galetto-Iammarino-Yu
-    if isMonomialIdeal(I) then (
-	return intersect(apply(mp, P -> jets(n,P)));
-	);
-    --compute the singular locus of I by breaking up components
-    -- finding singular locus of each
-    singComp := apply(mp, P -> ideal singularLocus P);
-    -- then also intersecting components two at a time
-    pairwiseInt := apply(subsets(mp,2),sum);
-    -- and finally taking the union
-    sing := intersect(singComp|pairwiseInt);
     --map the singular locus to the zero jets via the map i
     --then to the n jets via the map p
     sing0 := p i sing;
@@ -629,16 +635,19 @@ Node
     References
     	@arXiv("math/0612862","L. Ein and M. Mustaţă,
     		Jet schemes and singularities.")@
-		
-    	@arXiv("2104.08933","F. Galetto, E. Helmick, and M. Walsh,
-    		Jet graphs.")@
+
+    	@arXiv("math/0407113","P. Vojta,
+	    	Jets via Hasse-Schmidt Derivations.")@
 		
     	@HREF("https://doi.org/10.1080/00927870500454927",
 	    "R.A. Goward and K.E. Smith,
 	    The jet scheme of a monomial scheme.")@
-
-    	@arXiv("math/0407113","P. Vojta,
-	    	Jets via Hasse-Schmidt Derivations.")@
+		
+    	@arXiv("2104.08933","F. Galetto, E. Helmick, and M. Walsh,
+    		Jet graphs.")@
+		
+    	@arXiv("2407.01836","F. Galetto, N. Iammarino, and T. Yu,
+	    Jets and principal components of monomial ideals, and very well-covered graphs")@
     Subnodes
     	:Package methods
     	jets
